@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============ 设计 Token（CSS 变量） ============ */
+:root {
+  /* 品牌 */
+  --color-brand: #1D9E75;
+  --color-brand-light: #E1F5EE;
+  --color-brand-dark: #0F6E56;
+  /* 中性 */
+  --color-bg: #F7F6F2;
+  --color-surface: #FFFFFF;
+  --color-text: #1A1A18;
+  --color-text-secondary: #6B6B67;
+  --color-text-tertiary: #A8A8A2;
+  --color-border: #EBEBEB;
+  /* 功能色（字 / 底）*/
+  --color-warning: #EF9F27;        --color-warning-bg: #FAEEDA;
+  --color-danger: #D85A30;          --color-danger-bg: #FAECE7;
+  --color-behavior: #534AB7;        --color-behavior-bg: #EEEDFE;
+  --color-gear: #185FA5;            --color-gear-bg: #E6F1FB;
+  --color-error: #E24B4A;           --color-error-bg: #FCEBEB;
+  /* 状态色 */
+  --color-resolved-bg: #EAF3DE;     --color-resolved-text: #27500A;
+  --color-urgent-bg: #FCEBEB;       --color-urgent-text: #791F1F;
+  /* 间距（4px 基准）*/
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
+  --space-4: 16px; --space-6: 24px; --space-8: 32px;
+  /* 圆角（全局矩形直边 radius 0）*/
+  --radius-pill: 20px;  --radius-button: 10px;
+  --radius-sheet-top: 20px;  --radius-pet: 14px;
+  /* 动效 */
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* —— 预留深色变量（本期不启用，留空待填）—— */
+  /*
+  --color-brand-darkmode: #...;
+  --color-bg-darkmode: #...;
+  --color-surface-darkmode: #...;
+  --color-text-darkmode: #...;
+  --color-text-secondary-darkmode: #...;
+  --color-text-tertiary-darkmode: #...;
+  --color-border-darkmode: #...;
+  */
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  /* 桌面端手机画布外的底色 */
+  background: #ECEAE4;
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============ 动效工具类（全局动效 ≤300ms） ============ */
+@layer utilities {
+  .animate-fade-up {
+    animation: fadeUp 300ms var(--ease) both;
+  }
+  .animate-slide-up {
+    animation: slideUp 300ms var(--ease) both;
+  }
+  .animate-slide-down {
+    animation: slideDown 250ms var(--ease) both;
+  }
+  .animate-like {
+    animation: likeBounce 200ms var(--ease);
+  }
+  .animate-toast {
+    animation: toastIn 300ms var(--ease) both;
+  }
+  .transition-bg {
+    transition: background-color 180ms var(--ease), color 180ms var(--ease);
+  }
+  /* 隐藏滚动条但保留滚动能力 */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes slideDown {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes likeBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+/* 错开 60ms：在组件上用 style={{ animationDelay: `${i * 60}ms` }} */
