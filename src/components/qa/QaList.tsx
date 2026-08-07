@@ -11,11 +11,11 @@ export function QaList({ questions }: { questions: Question[] }) {
         if (b.status === 'urgent' && a.status !== 'urgent') return 1;
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }),
-    [questions]
+    [questions],
   );
 
   if (sorted.length === 0) {
-    return <div className="text-center text-text-tertiary py-10 text-sm">暂无相关问题</div>;
+    return <div className="py-10 text-center text-sm text-text-tertiary">暂无相关问题</div>;
   }
 
   return (

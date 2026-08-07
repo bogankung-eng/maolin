@@ -22,7 +22,7 @@ describe('Store 交互逻辑', () => {
   it('toggleLike：已点赞 -> 取消，likes -1', () => {
     // post_2 初始 liked=true, likes=89
     useAppStore.getState().toggleLike('post_2');
-    let p = useAppStore.getState().posts.find((p) => p.id === 'post_2')!;
+    const p = useAppStore.getState().posts.find((p) => p.id === 'post_2')!;
     expect(p.liked).toBe(false);
     expect(p.likes).toBe(88);
   });
@@ -71,7 +71,9 @@ describe('Store 交互逻辑', () => {
   it('addQuestion：新提问置顶、status=open、answers=[]、createdAt 最近', () => {
     const lenBefore = useAppStore.getState().questions.length;
     const before = Date.now();
-    useAppStore.getState().addQuestion({ category: 'diet', title: '幼犬一天喂几顿？', content: '求助' });
+    useAppStore
+      .getState()
+      .addQuestion({ category: 'diet', title: '幼犬一天喂几顿？', content: '求助' });
     const after = Date.now();
 
     const questions = useAppStore.getState().questions;

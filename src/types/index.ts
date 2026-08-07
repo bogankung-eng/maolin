@@ -11,8 +11,33 @@ export type HealthType = 'vaccine' | 'deworm' | 'weight';
 export type HealthStatus = 'normal' | 'due-soon' | 'overdue' | 'none';
 /** 发布模式：发帖 / 提问 */
 export type PublishMode = 'post' | 'question';
+/** 通知类型：被点赞 / 被评论 / 问题被回答 / 健康到期 */
+export type NotificationType = 'like' | 'comment' | 'answer' | 'health';
+/** 问答状态筛选：全部 / 待解答(open) / 已解决(resolved) / 紧急(urgent) */
+export type QaFilter = 'all' | QaStatus;
 
 // ============ 实体 ============
+
+/** 评论（支持一级回复：parentId 指向父评论） */
+export interface Comment {
+  id: string;
+  postId: string;
+  authorId: string;
+  content: string;
+  createdAt: string; // ISO
+  parentId?: string; // 有值 = 楼中楼一级回复
+}
+
+/** 通知 */
+export interface Notification {
+  id: string;
+  type: NotificationType; // 决定 emoji 图标与跳转映射
+  message: string; // 完整文案（种子直接给最终文案）
+  targetType: 'post' | 'question' | 'pet'; // 跳转目标类型
+  targetId: string; // 跳转目标 id
+  createdAt: string; // ISO
+  read: boolean; // 已读态（持久化）
+}
 /** 用户统计 */
 export interface UserStats {
   posts: number; // 动态
@@ -29,6 +54,7 @@ export interface User {
   city: string; // 城市（mock）
   petYears: number; // 养宠年限
   stats: UserStats;
+  followingIds: string[]; // 新增：当前用户关注的人（种子预置 ['u_lin','u_zhou']）
 }
 
 /** 宠物 */

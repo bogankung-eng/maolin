@@ -8,12 +8,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /** 主按钮：圆角 10，品牌绿 */
-export function Button({
-  children,
-  variant = 'primary',
-  className = '',
-  ...rest
-}: ButtonProps) {
+export function Button({ children, variant = 'primary', className = '', ...rest }: ButtonProps) {
   const base = 'rounded-button px-4 py-2 text-sm font-medium transition-bg disabled:opacity-50';
   const styles =
     variant === 'primary'

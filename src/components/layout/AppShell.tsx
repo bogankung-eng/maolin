@@ -9,10 +9,10 @@ import { Toast } from '@/components/common/Toast';
  */
 export function AppShell() {
   return (
-    <div className="min-h-screen w-full flex justify-center bg-[#ECEAE4]">
-      <div className="relative w-full max-w-app bg-bg h-screen flex flex-col overflow-hidden">
+    <div className="flex min-h-screen w-full justify-center bg-[#ECEAE4]">
+      <div className="relative flex h-screen w-full max-w-app flex-col overflow-hidden bg-bg">
         {/* 主滚动区 */}
-        <main className="flex-1 overflow-y-auto no-scrollbar pb-[72px]">{<Outlet />}</main>
+        <main className="no-scrollbar flex-1 overflow-y-auto pb-safe-nav">{<Outlet />}</main>
         {/* 底部导航 */}
         <BottomNav />
         {/* 全局发布弹层 */}

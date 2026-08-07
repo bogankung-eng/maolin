@@ -19,7 +19,8 @@ export function ProfilePage() {
   const stats = [
     { label: '动态', value: currentUser.stats.posts },
     { label: '粉丝', value: currentUser.stats.fans },
-    { label: '关注', value: currentUser.stats.following },
+    // V2：关注统计改为派生 followingIds.length（种子=2），不再硬编码 stats.following
+    { label: '关注', value: (currentUser.followingIds ?? []).length },
     { label: '回答', value: currentUser.stats.answers },
   ];
 
@@ -34,38 +35,38 @@ export function ProfilePage() {
   return (
     <div className="min-h-full">
       {/* 头部 */}
-      <header className="bg-surface px-4 pt-6 pb-4">
+      <header className="bg-surface px-4 pb-4 pt-6">
         <div className="flex items-center gap-4">
           <Avatar emoji={currentUser.avatarEmoji} size={64} />
           <div className="flex flex-col">
             <span className="text-xl font-bold text-text">{currentUser.name}</span>
-            <span className="text-xs text-text-secondary mt-1">
+            <span className="mt-1 text-xs text-text-secondary">
               {currentUser.city} · 养宠 {currentUser.petYears} 年
             </span>
           </div>
         </div>
 
         {/* 统计 4 等分 */}
-        <div className="grid grid-cols-4 mt-4 text-center">
+        <div className="mt-4 grid grid-cols-4 text-center">
           {stats.map((s) => (
             <div key={s.label}>
               <div className="text-base font-semibold text-text">{s.value}</div>
-              <div className="text-xs text-text-secondary mt-0.5">{s.label}</div>
+              <div className="mt-0.5 text-xs text-text-secondary">{s.label}</div>
             </div>
           ))}
         </div>
       </header>
 
       {/* 我的宠物 */}
-      <section className="px-4 mt-4">
-        <h2 className="text-sm font-semibold text-text mb-2">我的宠物</h2>
+      <section className="mt-4 px-4">
+        <h2 className="mb-2 text-sm font-semibold text-text">我的宠物</h2>
         <div className="flex flex-col gap-2">
           {pets.map((pet) => (
-            <PetCard key={pet.id} pet={pet} />
+            <PetCard key={pet.id} pet={pet} onClick={() => navigate(`/pet/${pet.id}`)} />
           ))}
           <button
             onClick={handleAddPet}
-            className="flex items-center justify-center gap-2 border border-dashed border-border rounded-pet py-4 text-text-secondary text-sm transition-bg hover:border-brand"
+            className="transition-bg flex items-center justify-center gap-2 rounded-pet border border-dashed border-border py-4 text-sm text-text-secondary hover:border-brand"
           >
             ＋ 添加宠物
           </button>
@@ -73,14 +74,14 @@ export function ProfilePage() {
       </section>
 
       {/* 健康记录 */}
-      <section className="px-4 mt-6">
-        <h2 className="text-sm font-semibold text-text mb-2">健康记录</h2>
+      <section className="mt-6 px-4">
+        <h2 className="mb-2 text-sm font-semibold text-text">健康记录</h2>
         <HealthRecordList records={healthRecords} />
       </section>
 
       {/* 动态九宫格 */}
-      <section className="px-4 mt-6 mb-8">
-        <h2 className="text-sm font-semibold text-text mb-2">我的动态</h2>
+      <section className="mb-8 mt-6 px-4">
+        <h2 className="mb-2 text-sm font-semibold text-text">我的动态</h2>
         {myPosts.length === 0 ? (
           <div className="text-sm text-text-tertiary">还没有动态，去发布一条吧～</div>
         ) : (
@@ -92,14 +93,14 @@ export function ProfilePage() {
                 <button
                   key={p.id}
                   onClick={() => navigate(`/post/${p.id}`)}
-                  className="aspect-square bg-bg rounded-button overflow-hidden flex items-center justify-center"
+                  className="flex aspect-square items-center justify-center overflow-hidden rounded-button bg-bg"
                 >
                   {isUrl ? (
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <img src={img} alt="" className="h-full w-full object-cover" />
                   ) : img ? (
                     <span className="text-3xl">{img}</span>
                   ) : (
-                    <span className="text-xs text-text-tertiary px-1 text-center line-clamp-2">
+                    <span className="line-clamp-2 px-1 text-center text-xs text-text-tertiary">
                       {p.content.slice(0, 12)}
                     </span>
                   )}

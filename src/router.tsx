@@ -5,6 +5,8 @@ import { QaPage } from './pages/QaPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { PostDetailPage } from './pages/PostDetailPage';
 import { QaDetailPage } from './pages/QaDetailPage';
+import { PetDetailPage } from './pages/PetDetailPage';
+import { NotificationPage } from './pages/NotificationPage';
 
 // 路由表：底部 5 Tab 走路由，发布弹层走 overlay（不占路由）
 export const router = createBrowserRouter([
@@ -18,6 +20,8 @@ export const router = createBrowserRouter([
       { path: 'profile', element: <ProfilePage /> },
       { path: 'post/:id', element: <PostDetailPage /> },
       { path: 'qa/:id', element: <QaDetailPage /> },
+      { path: 'pet/:id', element: <PetDetailPage /> },
+      { path: 'notifications', element: <NotificationPage /> },
     ],
   },
 ]);

@@ -5,31 +5,44 @@
 /* ============ 设计 Token（CSS 变量） ============ */
 :root {
   /* 品牌 */
-  --color-brand: #1D9E75;
-  --color-brand-light: #E1F5EE;
-  --color-brand-dark: #0F6E56;
+  --color-brand: #1d9e75;
+  --color-brand-light: #e1f5ee;
+  --color-brand-dark: #0f6e56;
   /* 中性 */
-  --color-bg: #F7F6F2;
-  --color-surface: #FFFFFF;
-  --color-text: #1A1A18;
-  --color-text-secondary: #6B6B67;
-  --color-text-tertiary: #A8A8A2;
-  --color-border: #EBEBEB;
+  --color-bg: #f7f6f2;
+  --color-surface: #ffffff;
+  --color-text: #1a1a18;
+  --color-text-secondary: #6b6b67;
+  --color-text-tertiary: #a8a8a2;
+  --color-border: #ebebeb;
   /* 功能色（字 / 底）*/
-  --color-warning: #EF9F27;        --color-warning-bg: #FAEEDA;
-  --color-danger: #D85A30;          --color-danger-bg: #FAECE7;
-  --color-behavior: #534AB7;        --color-behavior-bg: #EEEDFE;
-  --color-gear: #185FA5;            --color-gear-bg: #E6F1FB;
-  --color-error: #E24B4A;           --color-error-bg: #FCEBEB;
+  --color-warning: #ef9f27;
+  --color-warning-bg: #faeeda;
+  --color-danger: #d85a30;
+  --color-danger-bg: #faece7;
+  --color-behavior: #534ab7;
+  --color-behavior-bg: #eeedfe;
+  --color-gear: #185fa5;
+  --color-gear-bg: #e6f1fb;
+  --color-error: #e24b4a;
+  --color-error-bg: #fcebeb;
   /* 状态色 */
-  --color-resolved-bg: #EAF3DE;     --color-resolved-text: #27500A;
-  --color-urgent-bg: #FCEBEB;       --color-urgent-text: #791F1F;
+  --color-resolved-bg: #eaf3de;
+  --color-resolved-text: #27500a;
+  --color-urgent-bg: #fcebeb;
+  --color-urgent-text: #791f1f;
   /* 间距（4px 基准）*/
-  --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
-  --space-4: 16px; --space-6: 24px; --space-8: 32px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
   /* 圆角（全局矩形直边 radius 0）*/
-  --radius-pill: 20px;  --radius-button: 10px;
-  --radius-sheet-top: 20px;  --radius-pet: 14px;
+  --radius-pill: 20px;
+  --radius-button: 10px;
+  --radius-sheet-top: 20px;
+  --radius-pet: 14px;
   /* 动效 */
   --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
 
@@ -55,7 +68,7 @@ body {
   margin: 0;
   font-family: 'Noto Sans SC', system-ui, sans-serif;
   /* 桌面端手机画布外的底色 */
-  background: #ECEAE4;
+  background: #eceae4;
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
 }
@@ -78,7 +91,9 @@ body {
     animation: toastIn 300ms var(--ease) both;
   }
   .transition-bg {
-    transition: background-color 180ms var(--ease), color 180ms var(--ease);
+    transition:
+      background-color 180ms var(--ease),
+      color 180ms var(--ease);
   }
   /* 隐藏滚动条但保留滚动能力 */
   .no-scrollbar::-webkit-scrollbar {
@@ -87,6 +102,17 @@ body {
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  /* ============ safe-area 工具类（P0-11） ============
+     底部固定元素一律用这些 Token 类，禁止再写裸 pb-[72px] / bottom-[72px] */
+  .pb-safe-nav {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+  .bottom-safe-nav {
+    bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+  .h-safe-nav {
+    height: calc(72px + env(safe-area-inset-bottom));
   }
 }
 

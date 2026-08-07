@@ -13,7 +13,7 @@ describe('组件冒烟', () => {
     render(
       <MemoryRouter initialEntries={['/feed']}>
         <BottomNav />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText('首页')).toBeInTheDocument();
     expect(screen.getByText('问答')).toBeInTheDocument();
@@ -27,7 +27,7 @@ describe('组件冒烟', () => {
     render(
       <MemoryRouter>
         <FeedPage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     // 顶栏 Logo
     expect(screen.getByText('毛邻')).toBeInTheDocument();

@@ -5,7 +5,11 @@ import type { HealthRecord } from '@/types';
 const DAY = 86400000;
 
 /** 以 base 为「今天」，offsetDays 天后的健康记录（date 为下次提醒日） */
-function recAt(offsetDays: number, base: number, type: HealthRecord['type'] = 'vaccine'): HealthRecord {
+function recAt(
+  offsetDays: number,
+  base: number,
+  type: HealthRecord['type'] = 'vaccine',
+): HealthRecord {
   return {
     id: 'x',
     petId: 'p',
@@ -44,7 +48,13 @@ describe('computeHealthStatus 健康状态色判定', () => {
   });
 
   it('无 date 且体重类 -> normal', () => {
-    const rec: HealthRecord = { id: 'h', petId: 'p', type: 'weight', title: '体重', value: '4.8kg' };
+    const rec: HealthRecord = {
+      id: 'h',
+      petId: 'p',
+      type: 'weight',
+      title: '体重',
+      value: '4.8kg',
+    };
     expect(computeHealthStatus(rec)).toBe('normal');
   });
 
@@ -54,12 +64,24 @@ describe('computeHealthStatus 健康状态色判定', () => {
   });
 
   it('种子数据 h1(60天后疫苗) -> normal', () => {
-    const rec: HealthRecord = { id: 'h1', petId: 'p1', type: 'vaccine', title: '狂犬疫苗', date: new Date(base + 60 * DAY).toISOString() };
+    const rec: HealthRecord = {
+      id: 'h1',
+      petId: 'p1',
+      type: 'vaccine',
+      title: '狂犬疫苗',
+      date: new Date(base + 60 * DAY).toISOString(),
+    };
     expect(computeHealthStatus(rec, new Date(base))).toBe('normal');
   });
 
   it('种子数据 h3(5天前疫苗) -> overdue', () => {
-    const rec: HealthRecord = { id: 'h3', petId: 'p2', type: 'vaccine', title: '猫三联', date: new Date(base - 5 * DAY).toISOString() };
+    const rec: HealthRecord = {
+      id: 'h3',
+      petId: 'p2',
+      type: 'vaccine',
+      title: '猫三联',
+      date: new Date(base - 5 * DAY).toISOString(),
+    };
     expect(computeHealthStatus(rec, new Date(base))).toBe('overdue');
   });
 });

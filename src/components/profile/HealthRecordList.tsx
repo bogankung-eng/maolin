@@ -22,21 +22,19 @@ export function HealthRecordList({ records }: { records: HealthRecord[] }) {
         return (
           <div
             key={r.id}
-            className="flex items-center justify-between bg-surface border border-border rounded-button px-3 py-2"
+            className="flex items-center justify-between rounded-button border border-border bg-surface px-3 py-2"
           >
             <div className="min-w-0">
               <div className="text-sm text-text">{r.title}</div>
               {r.date && (
-                <div className="text-xs text-text-tertiary mt-0.5">
+                <div className="mt-0.5 text-xs text-text-tertiary">
                   提醒日期：{formatDate(r.date)}
                 </div>
               )}
-              {r.value && (
-                <div className="text-xs text-text-tertiary mt-0.5">数值：{r.value}</div>
-              )}
+              {r.value && <div className="mt-0.5 text-xs text-text-tertiary">数值：{r.value}</div>}
             </div>
             <span
-              className="text-xs px-2 py-0.5 rounded-pill shrink-0 ml-2"
+              className="ml-2 shrink-0 rounded-pill px-2 py-0.5 text-xs"
               style={{ background: meta.bg, color: meta.color }}
             >
               {meta.text}

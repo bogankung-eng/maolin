@@ -23,3 +23,9 @@ npm-debug.log*
 
 # Test
 coverage/
+
+# Vitest 临时配置
+*.timestamp-*.mjs
+
+# Vitest 临时配置
+*.timestamp-*.mjs

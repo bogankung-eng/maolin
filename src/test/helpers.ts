@@ -5,6 +5,8 @@ import {
   seedQuestions,
   seedPets,
   seedHealthRecords,
+  seedComments,
+  seedNotifications,
 } from '@/mock/data';
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
@@ -16,13 +18,15 @@ const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 export function resetStore(): void {
   localStorage.clear();
   useAppStore.setState({
-    currentUser,
+    currentUser: clone(currentUser),
     publishOverlay: { open: false, mode: 'post' },
     toast: { message: '', visible: false },
     posts: clone(seedPosts),
     questions: clone(seedQuestions),
     pets: clone(seedPets),
     healthRecords: clone(seedHealthRecords),
+    comments: clone(seedComments),
+    notifications: clone(seedNotifications),
     activeTab: 'recommend',
     activeCategory: 'all',
     qaCategory: 'all',

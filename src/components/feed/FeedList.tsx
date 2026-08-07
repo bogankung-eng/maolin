@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { PostCard } from './PostCard';
-import { delay } from '@/lib/mockApi';
+import { api } from '@/api';
 import type { Post } from '@/types';
 
 const PAGE = 6;
@@ -16,48 +16,94 @@ function getScrollParent(node: HTMLElement | null): HTMLElement | null {
   return null;
 }
 
-/** 卡片流：上滑加载更多（本地切片 + 模拟异步），支持下拉刷新 */
+/**
+ * 卡片流：上滑加载更多 + 下拉刷新（P0-7/8）。
+ * 竞态防护：
+ * - loadingRef/refreshingRef 同步防抖（连续 IO 触发只 loadMore 1 次）
+ * - mountedRef 卸载取消（pending 回调不再 setState）
+ * - listRef 列表变更丢弃过期响应
+ * - IO 只依赖 [posts] 重建
+ */
 export function FeedList({ posts }: { posts: Post[] }) {
   const [visible, setVisible] = useState(PAGE);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const sentinel = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(false);
+  const refreshingRef = useRef(false);
+  const mountedRef = useRef(true);
+  const listRef = useRef(posts);
+  const visibleRef = useRef(PAGE);
+
+  // 卸载取消：延迟回调不再 setState、不报错
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // 数据变化重置分页
   useEffect(() => {
+    listRef.current = posts;
+    visibleRef.current = PAGE;
+    loadingRef.current = false;
+    setLoading(false);
     setVisible(PAGE);
   }, [posts]);
 
+  // 同步 visible 镜像（供 loadMore 计算页码）
+  useEffect(() => {
+    visibleRef.current = visible;
+  }, [visible]);
+
   const loadMore = () => {
-    if (loading || visible >= posts.length) return;
+    if (loadingRef.current) return;
+    const list = listRef.current;
+    if (visibleRef.current >= list.length) return;
+    loadingRef.current = true;
     setLoading(true);
-    delay(400).then(() => {
-      setVisible((v) => Math.min(v + PAGE, posts.length));
+    const page = Math.floor(visibleRef.current / PAGE) + 1;
+    // P0-7：显式走 api 层（mock 模式下 sourceList 注入已过滤列表）
+    api.getFeedPage(page, PAGE, list).then((result) => {
+      // 已卸载或列表已变更 → 丢弃过期响应
+      if (!mountedRef.current || listRef.current !== list) {
+        loadingRef.current = false;
+        return;
+      }
+      loadingRef.current = false;
       setLoading(false);
+      setVisible((v) => Math.min(v + result.length, list.length));
     });
   };
 
-  // 触底加载更多（IntersectionObserver）
+  const loadMoreRef = useRef(loadMore);
+  loadMoreRef.current = loadMore;
+
+  // 触底加载更多（IntersectionObserver，仅依赖 [posts] 重建）
   useEffect(() => {
     const el = sentinel.current;
     if (!el) return;
     const io = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) loadMore();
+        if (entries[0].isIntersecting) loadMoreRef.current();
       },
-      { rootMargin: '120px' }
+      { rootMargin: '120px' },
     );
     io.observe(el);
     return () => io.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [posts, visible, loading]);
+  }, [posts]);
 
   const doRefresh = () => {
-    if (refreshing) return;
+    if (refreshingRef.current) return;
+    refreshingRef.current = true;
     setRefreshing(true);
-    delay(500).then(() => {
-      setVisible(PAGE);
+    api.getFeedPage(1, PAGE, listRef.current).then(() => {
+      if (!mountedRef.current) return;
+      refreshingRef.current = false;
       setRefreshing(false);
+      setVisible(PAGE);
     });
   };
 
@@ -82,24 +128,18 @@ export function FeedList({ posts }: { posts: Post[] }) {
 
   return (
     <div onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      {refreshing && (
-        <div className="text-center text-xs text-text-tertiary py-2">刷新中…</div>
-      )}
+      {refreshing && <div className="py-2 text-center text-xs text-text-tertiary">刷新中…</div>}
       {shown.map((p, i) => (
-        <div
-          key={p.id}
-          className="animate-fade-up"
-          style={{ animationDelay: `${i * 60}ms` }}
-        >
+        <div key={p.id} className="animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
           <PostCard post={p} />
         </div>
       ))}
-      {loading && <div className="text-center text-xs text-text-tertiary py-3">加载中…</div>}
+      {loading && <div className="py-3 text-center text-xs text-text-tertiary">加载中…</div>}
       {visible >= posts.length && posts.length > 0 && (
-        <div className="text-center text-xs text-text-tertiary py-3">没有更多了</div>
+        <div className="py-3 text-center text-xs text-text-tertiary">没有更多了</div>
       )}
       {posts.length === 0 && (
-        <div className="text-center text-text-tertiary py-10 text-sm">这里还没有内容</div>
+        <div className="py-10 text-center text-sm text-text-tertiary">这里还没有内容</div>
       )}
       <div ref={sentinel} className="h-4" />
     </div>

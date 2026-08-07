@@ -35,7 +35,7 @@ export function QaDetailPage() {
 
   const isOwner = question.authorId === currentUser.id;
   const sortedAnswers = [...question.answers].sort(
-    (a, b) => (b.isBest ? 1 : 0) - (a.isBest ? 1 : 0)
+    (a, b) => (b.isBest ? 1 : 0) - (a.isBest ? 1 : 0),
   );
 
   const statusBadge =
@@ -59,8 +59,8 @@ export function QaDetailPage() {
   return (
     <div className="min-h-full bg-surface">
       {/* 顶部返回栏 */}
-      <header className="sticky top-0 z-10 bg-surface border-b border-border flex items-center h-[52px] px-4">
-        <button onClick={() => navigate(-1)} className="text-text-secondary mr-3">
+      <header className="sticky top-0 z-10 flex h-[52px] items-center border-b border-border bg-surface px-4">
+        <button onClick={() => navigate(-1)} className="mr-3 text-text-secondary">
           ←
         </button>
         <span className="text-base font-semibold text-text">问答详情</span>
@@ -70,25 +70,26 @@ export function QaDetailPage() {
       <div className="px-4 pt-4">
         <div className="flex items-center justify-between gap-2">
           <span
-            className="text-xs px-2 py-0.5 rounded-pill"
-            style={{ color: CategoryColor[question.category], background: CategoryBg[question.category] }}
+            className="rounded-pill px-2 py-0.5 text-xs"
+            style={{
+              color: CategoryColor[question.category],
+              background: CategoryBg[question.category],
+            }}
           >
             {CategoryLabel[question.category]}
           </span>
           <Badge tone={statusBadge.tone}>{statusBadge.text}</Badge>
         </div>
-        <h1 className="mt-2 text-base font-semibold text-text leading-snug">
-          {question.title}
-        </h1>
+        <h1 className="mt-2 text-base font-semibold leading-snug text-text">{question.title}</h1>
         {question.content && (
-          <p className="mt-2 text-sm text-text-secondary leading-relaxed whitespace-pre-wrap">
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
             {question.content}
           </p>
         )}
 
         {/* 提问者操作（标记最佳 / 标记紧急） */}
         {isOwner && (
-          <div className="flex gap-2 mt-3">
+          <div className="mt-3 flex gap-2">
             <Button
               variant="secondary"
               onClick={() => {
@@ -117,10 +118,8 @@ export function QaDetailPage() {
       </div>
 
       {/* 回答列表 */}
-      <section className="px-4 py-4 border-t border-border mt-4">
-        <h3 className="text-sm font-semibold text-text mb-3">
-          {question.answers.length} 个回答
-        </h3>
+      <section className="mt-4 border-t border-border px-4 py-4">
+        <h3 className="mb-3 text-sm font-semibold text-text">{question.answers.length} 个回答</h3>
         {sortedAnswers.length === 0 ? (
           <div className="text-sm text-text-tertiary">还没有回答，快来帮忙解答～</div>
         ) : (
@@ -132,7 +131,7 @@ export function QaDetailPage() {
                 canMarkBest={isOwner && !a.isBest && question.status !== 'resolved'}
                 onMarkBest={() => {
                   markBestAnswer(question.id, a.id);
-                  showToast('已设为最佳答案');
+                  showToast('已标记最佳答案，问题已解决');
                 }}
               />
             ))}
@@ -141,15 +140,18 @@ export function QaDetailPage() {
       </section>
 
       {/* 新增回答 */}
-      <section className="px-4 py-4 border-t border-border sticky bottom-[72px] bg-surface">
+      <section className="bottom-safe-nav sticky border-t border-border bg-surface px-4 py-4">
         <div className="flex gap-2">
           <input
             value={answerText}
             onChange={(e) => setAnswerText(e.target.value)}
             placeholder="写下你的回答…"
-            className="flex-1 bg-bg border border-border rounded-button px-3 py-2 text-sm text-text outline-none focus:border-brand transition-bg"
+            className="transition-bg flex-1 rounded-button border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-brand"
           />
-          <button onClick={submitAnswer} className="bg-brand text-white rounded-button px-4 text-sm">
+          <button
+            onClick={submitAnswer}
+            className="rounded-button bg-brand px-4 text-sm text-white"
+          >
             发布
           </button>
         </div>
@@ -169,24 +171,31 @@ function AnswerCard({
 }) {
   const author = getUserById(answer.authorId);
   return (
-    <div className="bg-bg rounded-button p-3">
+    <div className="rounded-button bg-bg p-3">
       <div className="flex items-center gap-2">
         <Avatar emoji={author.avatarEmoji} size={32} />
         <span className="text-sm font-medium text-text">{author.name}</span>
         {answer.isVet && (
-          <span className="text-xs text-brand-dark font-semibold flex items-center gap-0.5">
+          <span className="flex items-center gap-0.5 text-xs font-semibold text-brand-dark">
             {Icons.vet} 兽医
           </span>
         )}
         {answer.isBest && <Badge tone="resolved">最佳答案</Badge>}
+        {answer.isBest && (
+          <span
+            className={`rounded-pill px-2 py-0.5 text-xs font-medium ${
+              answer.isVet ? 'bg-brand-light text-brand' : 'bg-bg text-text-secondary'
+            }`}
+          >
+            {answer.isVet ? '+50 分 · 最佳答主' : '+20 分 · 优质回答'}
+          </span>
+        )}
       </div>
-      <p className="mt-2 text-sm text-text leading-relaxed whitespace-pre-wrap">
-        {answer.content}
-      </p>
+      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-text">{answer.content}</p>
       {canMarkBest && (
         <button
           onClick={onMarkBest}
-          className="mt-2 text-xs text-brand border border-brand rounded-pill px-3 py-1 transition-bg"
+          className="transition-bg mt-2 rounded-pill border border-brand px-3 py-1 text-xs text-brand"
         >
           设为最佳答案
         </button>

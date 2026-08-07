@@ -29,8 +29,11 @@ export function BottomNav() {
     }`;
 
   return (
-    <nav className="absolute bottom-0 inset-x-0 h-[72px] bg-surface border-t border-border flex items-center px-2 z-20">
-      <button className={itemClass(isFeed && activeTab === 'recommend')} onClick={() => goFeed('recommend')}>
+    <nav className="h-safe-nav absolute inset-x-0 bottom-0 z-20 flex items-center border-t border-border bg-surface px-2 pb-[env(safe-area-inset-bottom)]">
+      <button
+        className={itemClass(isFeed && activeTab === 'recommend')}
+        onClick={() => goFeed('recommend')}
+      >
         <span className="text-xl">{Icons.home}</span>
         <span>首页</span>
       </button>
@@ -42,15 +45,18 @@ export function BottomNav() {
       {/* 居中发布按钮（绿色圆角方块） */}
       <button
         onClick={() => openPublish('post')}
-        className="flex-1 flex items-center justify-center"
+        className="flex flex-1 items-center justify-center"
         aria-label="发布"
       >
-        <span className="w-12 h-12 rounded-button bg-brand text-white text-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(29,158,117,0.4)]">
+        <span className="flex h-12 w-12 items-center justify-center rounded-button bg-brand text-2xl text-white shadow-[0_4px_12px_rgba(29,158,117,0.4)]">
           {Icons.plus}
         </span>
       </button>
 
-      <button className={itemClass(isFeed && activeTab === 'local')} onClick={() => goFeed('local')}>
+      <button
+        className={itemClass(isFeed && activeTab === 'local')}
+        onClick={() => goFeed('local')}
+      >
         <span className="text-xl">{Icons.location}</span>
         <span>同城</span>
       </button>

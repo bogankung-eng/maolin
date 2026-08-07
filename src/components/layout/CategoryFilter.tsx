@@ -28,17 +28,17 @@ export function CategoryFilter({
 
   return (
     <div className="bg-bg">
-      <div className="flex gap-2 overflow-x-auto no-scrollbar px-4 py-2">
+      <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-2">
         {items.map((it) => {
           const isActive = active === it.key;
           return (
             <button
               key={it.key}
               onClick={() => setActive(it.key)}
-              className={`flex items-center gap-1 whitespace-nowrap rounded-pill px-3 py-1.5 text-sm border transition-bg ${
+              className={`transition-bg flex items-center gap-1 whitespace-nowrap rounded-pill border px-3 py-1.5 text-sm ${
                 isActive
-                  ? 'bg-brand text-white border-brand shadow-[0_2px_8px_rgba(29,158,117,0.3)]'
-                  : 'bg-surface text-text-secondary border-border'
+                  ? 'border-brand bg-brand text-white shadow-[0_2px_8px_rgba(29,158,117,0.3)]'
+                  : 'border-border bg-surface text-text-secondary'
               }`}
             >
               {it.icon && <span>{it.icon}</span>}

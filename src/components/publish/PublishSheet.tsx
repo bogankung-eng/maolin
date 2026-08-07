@@ -57,20 +57,16 @@ export function PublishSheet() {
   };
 
   return (
-    <BottomSheet
-      open={open}
-      onClose={closePublish}
-      title={isPost ? '发布动态' : '发起提问'}
-    >
+    <BottomSheet open={open} onClose={closePublish} title={isPost ? '发布动态' : '发起提问'}>
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={5}
         placeholder={isPost ? '分享你和毛孩子的故事…' : '描述你遇到的问题，越详细越好…'}
-        className="w-full bg-bg border border-border rounded-button px-3 py-2 text-sm text-text outline-none focus:border-brand transition-bg resize-none"
+        className="transition-bg w-full resize-none rounded-button border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-brand"
       />
 
-      <div className="mt-4 mb-2 text-xs text-text-secondary">选择分类</div>
+      <div className="mb-2 mt-4 text-xs text-text-secondary">选择分类</div>
       <div className="flex flex-wrap gap-2">
         {CATEGORIES.map((c) => {
           const active = category === c;
@@ -78,10 +74,10 @@ export function PublishSheet() {
             <button
               key={c}
               onClick={() => setCategory(c)}
-              className={`flex items-center gap-1 rounded-pill px-3 py-1.5 text-sm border transition-bg ${
+              className={`transition-bg flex items-center gap-1 rounded-pill border px-3 py-1.5 text-sm ${
                 active
-                  ? 'bg-brand text-white border-brand'
-                  : 'bg-surface text-text-secondary border-border'
+                  ? 'border-brand bg-brand text-white'
+                  : 'border-border bg-surface text-text-secondary'
               }`}
             >
               <span>{CategoryIcon[c]}</span>
@@ -91,7 +87,7 @@ export function PublishSheet() {
         })}
       </div>
 
-      <div className="flex gap-2 mt-6">
+      <div className="mt-6 flex gap-2">
         <Button variant="secondary" className="flex-1" onClick={closePublish}>
           取消
         </Button>

@@ -4,6 +4,8 @@ import type {
   Post,
   Question,
   HealthRecord,
+  Comment,
+  Notification,
   PostInput,
   QuestionInput,
 } from '@/types';
@@ -19,6 +21,7 @@ export const currentUser: User = {
   city: '杭州',
   petYears: 3,
   stats: { posts: 12, fans: 230, following: 80, answers: 18 },
+  followingIds: ['u_lin', 'u_zhou'], // V2：种子预置已关注 2 人
 };
 
 // ============ 其他 mock 用户（用于种子帖子 / 问答作者解析） ============
@@ -29,6 +32,7 @@ const u_lin: User = {
   city: '上海',
   petYears: 5,
   stats: { posts: 40, fans: 1200, following: 200, answers: 60 },
+  followingIds: [],
 };
 const u_zhou: User = {
   id: 'u_zhou',
@@ -37,6 +41,7 @@ const u_zhou: User = {
   city: '北京',
   petYears: 8,
   stats: { posts: 30, fans: 3000, following: 50, answers: 200 },
+  followingIds: [],
 };
 const u_chen: User = {
   id: 'u_chen',
@@ -45,6 +50,7 @@ const u_chen: User = {
   city: '广州',
   petYears: 2,
   stats: { posts: 15, fans: 300, following: 120, answers: 5 },
+  followingIds: [],
 };
 
 /** 全部用户集合，供 getUserById 解析作者 */
@@ -224,7 +230,8 @@ export const seedQuestions: Question[] = [
         questionId: 'q1',
         authorId: 'u_zhou',
         isVet: true,
-        content: '疫苗后 1-2 天食欲略降属正常反应，保证饮水、清淡饮食即可，若超过 48 小时仍不吃建议就诊。',
+        content:
+          '疫苗后 1-2 天食欲略降属正常反应，保证饮水、清淡饮食即可，若超过 48 小时仍不吃建议就诊。',
         likes: 42,
         isBest: false,
         createdAt: daysAgo(1).toString(),
@@ -316,6 +323,79 @@ export const seedQuestions: Question[] = [
   },
 ];
 
+// ============ 种子评论（覆盖 post_1/post_2/post_6，含 1 条楼中楼一级回复） ============
+export const seedComments: Comment[] = [
+  {
+    id: 'c1',
+    postId: 'post_1',
+    authorId: 'u_chen',
+    content: '打完疫苗蔫一天很正常，多陪陪它、注意保暖就好～',
+    createdAt: daysAgo(1).toString(),
+  },
+  {
+    id: 'c2',
+    postId: 'post_1',
+    authorId: 'u_zhou',
+    content: '补充：48 小时内食欲恢复就不用太担心，超过就去医院看看。',
+    parentId: 'c1', // 楼中楼一级回复样例
+    createdAt: daysAgo(1).toString(),
+  },
+  {
+    id: 'c3',
+    postId: 'post_2',
+    authorId: 'u_lin',
+    content: '兔粮配方太专业了，收藏！下次也试试这个比例～',
+    createdAt: daysAgo(2).toString(),
+  },
+  {
+    id: 'c4',
+    postId: 'post_6',
+    authorId: 'u_lin',
+    content: '豆豆生日快乐！🎉 三岁的小伙子啦～',
+    createdAt: daysAgo(2).toString(),
+  },
+];
+
+// ============ 种子通知（4 类各 ≥1 条，read/unread 混合，target 指向真实实体 post_6/q3/p2） ============
+export const seedNotifications: Notification[] = [
+  {
+    id: 'n1',
+    type: 'like',
+    message: '林小宠 赞了你的动态',
+    targetType: 'post',
+    targetId: 'post_6',
+    createdAt: daysAgo(1).toString(),
+    read: false,
+  },
+  {
+    id: 'n2',
+    type: 'comment',
+    message: '陈泡泡 评论了你的动态',
+    targetType: 'post',
+    targetId: 'post_6',
+    createdAt: daysAgo(2).toString(),
+    read: false,
+  },
+  {
+    id: 'n3',
+    type: 'answer',
+    message: '周兽医 回答了你的问题',
+    targetType: 'question',
+    targetId: 'q3',
+    createdAt: daysAgo(3).toString(),
+    read: true,
+  },
+  {
+    id: 'n4',
+    type: 'health',
+    message: '咪咪的 猫三联 已过期，请及时安排',
+    targetType: 'pet',
+    targetId: 'p2',
+    createdAt: daysAgo(4).toString(),
+    read: false,
+  },
+];
+
 // ============ 工厂函数（供 store action 复用） ============
 /** 生成一条帖子实体（带 id / 时间） */
 export function makePost(input: PostInput): Post {
@@ -347,5 +427,32 @@ export function makeQuestion(input: QuestionInput): Question {
     answers: [],
     status: 'open',
     createdAt: new Date().toISOString(),
+  };
+}
+
+/** 生成一条评论 / 一级回复实体（带 id / 时间，authorId 默认当前用户） */
+export function makeComment(
+  postId: string,
+  content: string,
+  authorId: string = currentUser.id,
+  parentId?: string,
+): Comment {
+  return {
+    id: genId(),
+    postId,
+    authorId,
+    content,
+    createdAt: new Date().toISOString(),
+    parentId,
+  };
+}
+
+/** 生成一条通知实体（带 id / 时间 / 未读，其余字段由输入决定） */
+export function makeNotification(input: Omit<Notification, 'id' | 'createdAt' | 'read'>): Notification {
+  return {
+    id: genId(),
+    ...input,
+    createdAt: new Date().toISOString(),
+    read: false,
   };
 }

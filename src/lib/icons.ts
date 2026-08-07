@@ -1,4 +1,4 @@
-import type { Category } from '@/types';
+import type { Category, NotificationType } from '@/types';
 
 // ============ 通用 emoji 图标 ============
 export const Icons = {
@@ -8,12 +8,21 @@ export const Icons = {
   location: '📍',
   user: '👤',
   search: '🔍',
+  bell: '🔔',
   heartOutline: '🤍',
   heartFill: '❤️',
   comment: '💬',
   share: '↗',
   vet: '✓',
 } as const;
+
+// ============ 通知类型图标 ============
+export const NotificationIcon: Record<NotificationType, string> = {
+  like: '💗',
+  comment: '💬',
+  answer: '💡',
+  health: '🩺',
+};
 
 // ============ 分类图标 ============
 export const CategoryIcon: Record<Category, string> = {

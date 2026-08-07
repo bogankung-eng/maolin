@@ -4,12 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { QaList } from '@/components/qa/QaList';
 import type { Question } from '@/types';
 
-function makeQ(
-  id: string,
-  title: string,
-  status: Question['status'],
-  createdAt: string
-): Question {
+function makeQ(id: string, title: string, status: Question['status'], createdAt: string): Question {
   return {
     id,
     authorId: 'u1',
@@ -26,13 +21,23 @@ const DAY = 86400000;
 
 describe('QaList 排序（紧急置顶 + 时间倒序）', () => {
   it('紧急项即使创建更早，也应排在最前', () => {
-    const oldUrgent = makeQ('qu', '紧急老问题', 'urgent', new Date(Date.now() - 10 * DAY).toISOString());
-    const newOpen = makeQ('qo', '最新开放问题', 'open', new Date(Date.now() - 1 * DAY).toISOString());
+    const oldUrgent = makeQ(
+      'qu',
+      '紧急老问题',
+      'urgent',
+      new Date(Date.now() - 10 * DAY).toISOString(),
+    );
+    const newOpen = makeQ(
+      'qo',
+      '最新开放问题',
+      'open',
+      new Date(Date.now() - 1 * DAY).toISOString(),
+    );
 
     render(
       <MemoryRouter>
         <QaList questions={[newOpen, oldUrgent]} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const headings = screen.getAllByRole('heading', { level: 3 });
@@ -46,7 +51,7 @@ describe('QaList 排序（紧急置顶 + 时间倒序）', () => {
     render(
       <MemoryRouter>
         <QaList questions={[older, newer]} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const headings = screen.getAllByRole('heading', { level: 3 });
@@ -58,7 +63,7 @@ describe('QaList 排序（紧急置顶 + 时间倒序）', () => {
     render(
       <MemoryRouter>
         <QaList questions={[]} />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText('暂无相关问题')).toBeInTheDocument();
   });

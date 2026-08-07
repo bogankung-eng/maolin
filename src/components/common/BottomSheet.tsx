@@ -35,24 +35,18 @@ export function BottomSheet({
   return (
     <div className="absolute inset-0 z-50">
       {/* 遮罩 */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={handleClose}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 bg-black/50" onClick={handleClose} aria-hidden="true" />
       {/* 面板：顶部 20 圆角，从底滑入 */}
       <div
-        className={`absolute bottom-0 inset-x-0 w-full bg-surface rounded-t-sheet max-h-[85%] overflow-y-auto ${
+        className={`absolute inset-x-0 bottom-0 max-h-[85%] w-full overflow-y-auto rounded-t-sheet bg-surface ${
           closing ? 'animate-slide-down' : 'animate-slide-up'
         }`}
       >
         {/* 拖拽把手 */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-border" />
+        <div className="flex justify-center pb-1 pt-3">
+          <div className="h-1 w-10 rounded-full bg-border" />
         </div>
-        {title && (
-          <div className="px-4 pb-2 text-base font-semibold text-text">{title}</div>
-        )}
+        {title && <div className="px-4 pb-2 text-base font-semibold text-text">{title}</div>}
         <div className="px-4 pb-6">{children}</div>
       </div>
     </div>

@@ -8,17 +8,19 @@ export function delay(ms: number = 300): Promise<void> {
 
 /**
  * 分页获取 Feed 帖子列表。
- * 基于 seedPosts 做客户端切片：page 与 size 均从 1 开始计数。
+ * 基于 seedPosts（或注入的 sourceList）做客户端切片：page 与 size 均从 1 开始计数。
+ * - sourceList 为 mock 模式专用「已过滤列表注入」；fetch 模式忽略（由后端按 query 过滤）
  * - page=1, size=6 → 返回前 6 条
  * - page=2, size=6 → 返回第 7 条起剩余的条目（不足一页则取实际剩余量）
  * - 越界页返回空数组 []
  */
-export async function getFeedPage(page: number = 1, size: number = 6): Promise<Post[]> {
+export async function getFeedPage(page: number = 1, size: number = 6, sourceList?: Post[]): Promise<Post[]> {
   await delay(300);
+  const base = sourceList ?? seedPosts;
   const safePage = Math.max(1, Math.floor(page));
   const safeSize = Math.max(1, Math.floor(size));
   const start = (safePage - 1) * safeSize;
-  return seedPosts.slice(start, start + safeSize);
+  return base.slice(start, start + safeSize);
 }
 
 /** 模拟插入帖子 */
