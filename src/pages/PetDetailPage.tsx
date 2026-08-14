@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { HealthRecordList } from '@/components/profile/HealthRecordList';
 import { PostCard } from '@/components/feed/PostCard';
+import { Icon } from '@/components/common/Icon';
+import { EmptyState } from '@/components/common/EmptyState';
 import { computeHealthStatus } from '@/types';
 import { formatDate } from '@/lib/mockApi';
 import type { HealthType } from '@/types';
@@ -42,14 +44,17 @@ export function PetDetailPage() {
 
   if (!pet) {
     return (
-      <div className="p-6 text-center text-text-tertiary">
-        宠物不存在
-        <div className="mt-4">
-          <button onClick={() => navigate(-1)} className="text-brand">
+      <EmptyState
+        title="宠物不存在"
+        action={
+          <button
+            onClick={() => navigate(-1)}
+            className="rounded-button bg-brand px-4 py-2 text-sm text-white"
+          >
             返回
           </button>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
@@ -70,8 +75,12 @@ export function PetDetailPage() {
     <div className="min-h-full bg-surface">
       {/* 顶部返回栏 */}
       <header className="sticky top-0 z-10 flex h-[52px] items-center border-b border-border bg-surface px-4">
-        <button onClick={() => navigate(-1)} className="mr-3 text-text-secondary">
-          ←
+        <button
+          onClick={() => navigate(-1)}
+          className="mr-3 text-text-secondary"
+          aria-label="返回"
+        >
+          <Icon name="chevronLeft" size={20} />
         </button>
         <span className="text-base font-semibold text-text">宠物详情</span>
       </header>
@@ -145,7 +154,7 @@ export function PetDetailPage() {
       <section className="mt-6">
         <h2 className="mb-2 px-4 text-sm font-semibold text-text">相关动态</h2>
         {relatedPosts.length === 0 ? (
-          <div className="px-4 pb-8 text-sm text-text-tertiary">还没有 TA 的动态</div>
+          <EmptyState title="还没有 TA 的动态" />
         ) : (
           <div className="pb-8">
             {relatedPosts.map((p) => (

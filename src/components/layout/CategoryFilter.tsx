@@ -21,9 +21,9 @@ export function CategoryFilter({
   const active = value ?? storeCat;
   const setActive = onChange ?? setStoreCat;
 
-  const items: { key: Category | 'all'; label: string; icon?: string }[] = [
+  const items: { key: Category | 'all'; label: string; icon?: Category }[] = [
     { key: 'all', label: '全部' },
-    ...CATEGORIES.map((c) => ({ key: c, label: CategoryLabel[c], icon: CategoryIcon[c] })),
+    ...CATEGORIES.map((c) => ({ key: c, label: CategoryLabel[c], icon: c })),
   ];
 
   return (
@@ -31,17 +31,18 @@ export function CategoryFilter({
       <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-2">
         {items.map((it) => {
           const isActive = active === it.key;
+          const ItemIcon = it.icon ? CategoryIcon[it.icon] : null;
           return (
             <button
               key={it.key}
               onClick={() => setActive(it.key)}
               className={`transition-bg flex items-center gap-1 whitespace-nowrap rounded-pill border px-3 py-1.5 text-sm ${
                 isActive
-                  ? 'border-brand bg-brand text-white shadow-[0_2px_8px_rgba(29,158,117,0.3)]'
+                  ? 'animate-pop border-brand bg-brand text-white shadow-[0_2px_8px_rgba(29,158,117,0.3)]'
                   : 'border-border bg-surface text-text-secondary'
               }`}
             >
-              {it.icon && <span>{it.icon}</span>}
+              {ItemIcon && <ItemIcon size={16} />}
               {it.label}
             </button>
           );

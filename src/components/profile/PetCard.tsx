@@ -1,4 +1,5 @@
 import type { Pet } from '@/types';
+import { Icon } from '@/components/common/Icon';
 
 /**
  * 宠物卡片：品种标签 + 健康提醒 + 绿底图标。
@@ -26,7 +27,7 @@ export function PetCard({ pet, onClick }: { pet: Pet; onClick?: () => void }) {
           <span className="mt-1 truncate text-xs text-text-secondary">{pet.healthReminder}</span>
         )}
       </div>
-      {onClick && <span className="shrink-0 text-text-tertiary">›</span>}
+      {onClick && <Icon name="chevronRight" size={18} className="shrink-0 text-text-tertiary" />}
     </div>
   );
 }

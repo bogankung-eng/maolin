@@ -1,11 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Badge } from '@/components/common/Badge';
+import { Icon } from '@/components/common/Icon';
 import { CategoryLabel, CategoryColor, CategoryBg } from '@/lib/icons';
 import type { Question } from '@/types';
 
-/** 问答条目：状态徽章 + 分类色标签 + 回答数 + 兽医标识 */
+/** 问答条目：状态徽章 + 分类色标签 + 标题 Link + 详情摘要 + 回答数 + 兽医标识（article 语义化） */
 export function QaItem({ question }: { question: Question }) {
-  const navigate = useNavigate();
   const hasVet = question.answers.some((a) => a.isVet);
 
   const statusMeta =
@@ -16,10 +16,7 @@ export function QaItem({ question }: { question: Question }) {
         : { text: '待解答', tone: 'open' as const };
 
   return (
-    <div
-      onClick={() => navigate(`/qa/${question.id}`)}
-      className="cursor-pointer border-b border-border bg-surface px-4 py-[14px]"
-    >
+    <article className="border-b border-border bg-surface px-4 py-[14px]">
       <div className="flex items-center justify-between gap-2">
         <span
           className="rounded-pill px-2 py-0.5 text-xs"
@@ -28,23 +25,27 @@ export function QaItem({ question }: { question: Question }) {
             background: CategoryBg[question.category],
           }}
         >
-          {CategoryIconLabel(question.category)}
+          {CategoryLabel[question.category]}
         </span>
         <Badge tone={statusMeta.tone}>{statusMeta.text}</Badge>
       </div>
 
       <h3 className="mt-2 line-clamp-2 text-sm font-medium leading-snug text-text">
-        {question.title}
+        <Link to={`/qa/${question.id}`}>{question.title}</Link>
       </h3>
+
+      {question.content && (
+        <p className="mt-1 line-clamp-1 text-xs text-text-tertiary">{question.content}</p>
+      )}
 
       <div className="mt-2 flex items-center gap-3 text-xs text-text-secondary">
         <span>{question.answers.length} 回答</span>
-        {hasVet && <span className="font-medium text-brand-dark">兽医✓ 已回答</span>}
+        {hasVet && (
+          <span className="font-medium text-brand-dark">
+            兽医 <Icon name="vet" size={14} /> 已回答
+          </span>
+        )}
       </div>
-    </div>
+    </article>
   );
-}
-
-function CategoryIconLabel(c: Question['category']): string {
-  return CategoryLabel[c];
 }

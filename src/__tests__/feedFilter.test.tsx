@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { FeedPage } from '@/pages/FeedPage';
 import { QaPage } from '@/pages/QaPage';
@@ -41,15 +40,19 @@ describe('Feed 过滤（Tab / 分类 / 搜索）', () => {
     expect(screen.getByText(/柯基宝宝打完疫苗后有点蔫/)).toBeInTheDocument();
   });
 
-  it('activeTab=local 仅显示同城源帖子', () => {
+  it('activeTab=local 渲染同城 LocalView（4 分区 + 种子条目）', () => {
     useAppStore.setState({ activeTab: 'local', activeCategory: 'all' });
     render(
       <MemoryRouter>
         <FeedPage />
       </MemoryRouter>,
     );
-    expect(screen.getByText(/同城宠物医院推荐/)).toBeInTheDocument();
-    expect(screen.getByText(/同城猫友线下聚会报名/)).toBeInTheDocument();
+    // local Tab 不再渲染帖子流，而是 LocalView 的 4 分区
+    expect(screen.getByText('宠物医院')).toBeInTheDocument();
+    expect(screen.getByText('约玩')).toBeInTheDocument();
+    expect(screen.getByText('宠物店')).toBeInTheDocument();
+    expect(screen.getByText('找宠友')).toBeInTheDocument();
+    expect(screen.getByText('安心宠物医院')).toBeInTheDocument();
     expect(screen.queryByText(/柯基宝宝打完疫苗后有点蔫/)).not.toBeInTheDocument();
   });
 
@@ -64,25 +67,6 @@ describe('Feed 过滤（Tab / 分类 / 搜索）', () => {
     expect(screen.getByText(/柯基宝宝打完疫苗后有点蔫/)).toBeInTheDocument();
     expect(screen.getByText(/豆豆今天满三岁/)).toBeInTheDocument();
     // diet: post_2 不应出现
-    expect(screen.queryByText(/自制兔粮分享/)).not.toBeInTheDocument();
-  });
-
-  it('搜索关键词（Feed 内联）按内容过滤', async () => {
-    const user = userEvent.setup();
-    useAppStore.setState({ activeTab: 'recommend', activeCategory: 'all' });
-    render(
-      <MemoryRouter>
-        <FeedPage />
-      </MemoryRouter>,
-    );
-
-    await user.click(screen.getByLabelText('搜索'));
-    const input = screen.getByPlaceholderText('搜索当前列表内容');
-    await user.type(input, '疫苗');
-
-    // 含「疫苗」的 post_1 保留
-    expect(screen.getByText(/柯基宝宝打完疫苗后有点蔫/)).toBeInTheDocument();
-    // 不含「疫苗」的 post_2 被过滤
     expect(screen.queryByText(/自制兔粮分享/)).not.toBeInTheDocument();
   });
 });

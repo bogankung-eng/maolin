@@ -21,7 +21,7 @@ const renderProfile = () =>
   );
 
 describe('ProfilePage 我的页面', () => {
-  it('渲染用户信息与统计', () => {
+  it('渲染用户信息与统计（派生：动态1/粉丝230/关注2/回答0）', () => {
     renderProfile();
     expect(screen.getByText('阿豆')).toBeInTheDocument();
     expect(screen.getByText(/杭州 · 养宠 3 年/)).toBeInTheDocument();
@@ -29,7 +29,12 @@ describe('ProfilePage 我的页面', () => {
     expect(screen.getByText('粉丝')).toBeInTheDocument();
     expect(screen.getByText('关注')).toBeInTheDocument();
     expect(screen.getByText('回答')).toBeInTheDocument();
-    expect(screen.getByText('12')).toBeInTheDocument(); // stats.posts
+    // 统计真实化：不再消费硬编码 stats.posts(12)/answers(18)，改为派生计算
+    expect(screen.getByText('1')).toBeInTheDocument(); // 动态 = 种子 u_me 仅 1 帖
+    expect(screen.getByText('230')).toBeInTheDocument(); // 粉丝固定 230
+    expect(screen.getByText('2')).toBeInTheDocument(); // 关注 = followingIds.length
+    expect(screen.getByText('0')).toBeInTheDocument(); // 回答 = 0（无 u_me 回答）
+    expect(screen.queryByText('12')).not.toBeInTheDocument();
   });
 
   it('渲染宠物列表与"添加宠物"入口', () => {
@@ -37,7 +42,7 @@ describe('ProfilePage 我的页面', () => {
     expect(screen.getByText('我的宠物')).toBeInTheDocument();
     expect(screen.getByText('豆豆')).toBeInTheDocument();
     expect(screen.getByText('咪咪')).toBeInTheDocument();
-    expect(screen.getByText('＋ 添加宠物')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '添加宠物' })).toBeInTheDocument();
   });
 
   it('渲染健康记录区', () => {
@@ -64,29 +69,31 @@ describe('ProfilePage 我的页面', () => {
     expect(screen.getByText('我的动态')).toBeInTheDocument();
   });
 
-  it('添加宠物：prompt 取消则不添加', () => {
-    vi.spyOn(window, 'prompt').mockReturnValue(null);
+  it('添加宠物：PetForm 取消则不添加', () => {
     renderProfile();
-    fireEvent.click(screen.getByText('＋ 添加宠物'));
+    fireEvent.click(screen.getByRole('button', { name: '添加宠物' }));
+    expect(screen.getByPlaceholderText(/宠物昵称/)).toBeInTheDocument(); // PetForm 弹层已打开（以输入框区分入口按钮）
+    fireEvent.click(screen.getByRole('button', { name: '取消' }));
     expect(useAppStore.getState().pets).toHaveLength(3);
     expect(useAppStore.getState().toast.message).toBe('');
-    vi.restoreAllMocks();
   });
 
-  it('添加宠物：输入名称+品种则添加并提示', () => {
-    const promptMock = vi
-      .spyOn(window, 'prompt')
-      .mockReturnValueOnce('汤圆')
-      .mockReturnValueOnce('柴犬');
+  it('添加宠物：PetForm 输入昵称+品种则添加并提示', () => {
     renderProfile();
-    fireEvent.click(screen.getByText('＋ 添加宠物'));
+    fireEvent.click(screen.getByRole('button', { name: '添加宠物' }));
+    fireEvent.change(screen.getByPlaceholderText(/宠物昵称/), {
+      target: { value: '汤圆' },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/品种/), {
+      target: { value: '柴犬' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: '添加' }));
     const pets = useAppStore.getState().pets;
     expect(pets).toHaveLength(4);
     expect(pets[3].name).toBe('汤圆'); // addPet 追加到末尾
     expect(pets[3].species).toBe('柴犬');
     expect(pets[3].emoji).toBe('🐾');
     expect(useAppStore.getState().toast.message).toBe('已添加宠物');
-    promptMock.mockRestore();
   });
 });
 

@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from '@/components/common/Avatar';
+import { Icon } from '@/components/common/Icon';
 import { PetCard } from '@/components/profile/PetCard';
+import { PetForm } from '@/components/profile/PetForm';
 import { HealthRecordList } from '@/components/profile/HealthRecordList';
+import { deriveUserStats } from '@/lib/stats';
+import { isRealImage } from '@/lib/image';
 
 /** 我的：个人信息 / 统计 / 宠物 / 健康 / 动态九宫格 */
 export function ProfilePage() {
@@ -11,26 +16,19 @@ export function ProfilePage() {
   const pets = useAppStore((s) => s.pets);
   const healthRecords = useAppStore((s) => s.healthRecords);
   const posts = useAppStore((s) => s.posts);
-  const addPet = useAppStore((s) => s.addPet);
-  const showToast = useAppStore((s) => s.showToast);
+  const questions = useAppStore((s) => s.questions);
+  const [petFormOpen, setPetFormOpen] = useState(false);
 
   const myPosts = posts.filter((p) => p.authorId === currentUser.id);
 
+  // 统计真实化（F5）：动态/回答派生、关注=followingIds.length、粉丝固定 230
+  const derived = deriveUserStats(currentUser, posts, questions);
   const stats = [
-    { label: '动态', value: currentUser.stats.posts },
-    { label: '粉丝', value: currentUser.stats.fans },
-    // V2：关注统计改为派生 followingIds.length（种子=2），不再硬编码 stats.following
-    { label: '关注', value: (currentUser.followingIds ?? []).length },
-    { label: '回答', value: currentUser.stats.answers },
+    { label: '动态', value: derived.posts },
+    { label: '粉丝', value: derived.fans },
+    { label: '关注', value: derived.following },
+    { label: '回答', value: derived.answers },
   ];
-
-  const handleAddPet = () => {
-    const name = window.prompt('宠物昵称');
-    if (!name) return;
-    const species = window.prompt('品种（如 柯基）') || '未知';
-    addPet({ name, species, emoji: '🐾', breedTag: species, healthReminder: '' });
-    showToast('已添加宠物');
-  };
 
   return (
     <div className="min-h-full">
@@ -65,10 +63,11 @@ export function ProfilePage() {
             <PetCard key={pet.id} pet={pet} onClick={() => navigate(`/pet/${pet.id}`)} />
           ))}
           <button
-            onClick={handleAddPet}
+            onClick={() => setPetFormOpen(true)}
             className="transition-bg flex items-center justify-center gap-2 rounded-pet border border-dashed border-border py-4 text-sm text-text-secondary hover:border-brand"
           >
-            ＋ 添加宠物
+            <Icon name="plus" size={14} />
+            添加宠物
           </button>
         </div>
       </section>
@@ -88,14 +87,14 @@ export function ProfilePage() {
           <div className="grid grid-cols-3 gap-1">
             {myPosts.slice(0, 9).map((p) => {
               const img = p.images[0];
-              const isUrl = !!img && img.startsWith('http');
+              const isReal = isRealImage(img);
               return (
                 <button
                   key={p.id}
                   onClick={() => navigate(`/post/${p.id}`)}
                   className="flex aspect-square items-center justify-center overflow-hidden rounded-button bg-bg"
                 >
-                  {isUrl ? (
+                  {isReal ? (
                     <img src={img} alt="" className="h-full w-full object-cover" />
                   ) : img ? (
                     <span className="text-3xl">{img}</span>
@@ -110,6 +109,9 @@ export function ProfilePage() {
           </div>
         )}
       </section>
+
+      {/* 添加宠物表单弹层（替换 window.prompt） */}
+      <PetForm open={petFormOpen} onClose={() => setPetFormOpen(false)} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
+import { Icon } from '@/components/common/Icon';
 import { computeHealthStatus } from '@/types';
 import type { HealthStatus, Pet } from '@/types';
 
@@ -60,7 +61,9 @@ export function HealthBanner() {
                 {a.pet.name} · {a.title} {overdue ? '已过期' : '即将到期'}
               </span>
             </span>
-            <span className="shrink-0">去查看 →</span>
+            <span className="flex shrink-0 items-center gap-0.5">
+              去查看 <Icon name="arrowRight" size={14} />
+            </span>
           </button>
         );
       })}

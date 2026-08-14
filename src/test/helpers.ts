@@ -21,6 +21,7 @@ export function resetStore(): void {
     currentUser: clone(currentUser),
     publishOverlay: { open: false, mode: 'post' },
     toast: { message: '', visible: false },
+    shareOverlay: { open: false, postId: null },
     posts: clone(seedPosts),
     questions: clone(seedQuestions),
     pets: clone(seedPets),

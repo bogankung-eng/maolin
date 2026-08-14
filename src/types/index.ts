@@ -15,6 +15,10 @@ export type PublishMode = 'post' | 'question';
 export type NotificationType = 'like' | 'comment' | 'answer' | 'health';
 /** 问答状态筛选：全部 / 待解答(open) / 已解决(resolved) / 紧急(urgent) */
 export type QaFilter = 'all' | QaStatus;
+/** 同城分区：医院 / 约玩 / 宠物店 / 找宠友 */
+export type LocalSection = 'hospital' | 'play' | 'shop' | 'friend';
+/** 全局搜索分类 Tab */
+export type SearchTab = 'all' | 'post' | 'question' | 'user' | 'pet';
 
 // ============ 实体 ============
 
@@ -38,12 +42,25 @@ export interface Notification {
   createdAt: string; // ISO
   read: boolean; // 已读态（持久化）
 }
-/** 用户统计 */
+/** 同城条目（纯展示，不持久化，不进 store） */
+export interface LocalEntry {
+  id: string;
+  section: LocalSection;
+  city: string;
+  title: string;
+  subtitle: string;
+  emoji: string;
+}
+
+/** 用户统计（V3 起 posts/answers/following 不再消费，见 lib/stats.ts 派生计算） */
 export interface UserStats {
-  posts: number; // 动态
-  fans: number; // 粉丝
-  following: number; // 关注
-  answers: number; // 回答
+  /** @deprecated 动态改为按 posts 派生（deriveUserStats） */
+  posts: number;
+  fans: number; // 粉丝（固定 230，仍被 ProfilePage 读取）
+  /** @deprecated 关注改为 followingIds.length 派生 */
+  following: number;
+  /** @deprecated 回答改为按 answers 派生 */
+  answers: number;
 }
 
 /** 用户 */
@@ -84,6 +101,7 @@ export interface Post {
   id: string;
   authorId: string;
   petTag: string; // 宠物标签，如「🐶 豆豆」
+  petId?: string; // 新增：关联宠物 id（可选，随 posts 持久化）
   category?: Category;
   content: string;
   images: string[]; // emoji 或 picsum url（可选）
@@ -115,6 +133,7 @@ export interface Question {
   category: Category;
   title: string;
   content: string;
+  petId?: string; // 新增：提问可选关联宠物
   answers: Answer[];
   status: QaStatus;
   createdAt: string;
@@ -125,6 +144,7 @@ export interface Question {
 export interface PostInput {
   content: string;
   petTag: string;
+  petId?: string; // 新增：关联宠物 id
   tags: string[];
   images?: string[];
   source: FeedTab;
@@ -135,6 +155,7 @@ export interface QuestionInput {
   category: Category;
   title: string;
   content: string;
+  petId?: string; // 新增：可选关联宠物
 }
 /** 回答输入 */
 export interface AnswerInput {

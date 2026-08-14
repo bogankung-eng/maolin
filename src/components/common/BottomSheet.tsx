@@ -34,8 +34,12 @@ export function BottomSheet({
 
   return (
     <div className="absolute inset-0 z-50">
-      {/* 遮罩 */}
-      <div className="absolute inset-0 bg-black/50" onClick={handleClose} aria-hidden="true" />
+      {/* 遮罩（淡入/淡出 200ms） */}
+      <div
+        className={`absolute inset-0 bg-black/50 ${closing ? 'animate-fade-out' : 'animate-fade'}`}
+        onClick={handleClose}
+        aria-hidden="true"
+      />
       {/* 面板：顶部 20 圆角，从底滑入 */}
       <div
         className={`absolute inset-x-0 bottom-0 max-h-[85%] w-full overflow-y-auto rounded-t-sheet bg-surface ${

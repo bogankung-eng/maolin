@@ -83,6 +83,15 @@ describe('QaDetailPage 问答详情', () => {
     expect(screen.getByText('狗狗打完疫苗后食欲不振怎么办？')).toBeInTheDocument();
   });
 
+  it('提问关联宠物时展示品种徽章', () => {
+    // 给 q1 关联 p1（柯基），验证详情页展示品种徽章
+    useAppStore.setState((s) => ({
+      questions: s.questions.map((q) => (q.id === 'q1' ? { ...q, petId: 'p1' } : q)),
+    }));
+    renderQa('q1');
+    expect(screen.getByText('柯基')).toBeInTheDocument();
+  });
+
   it('提交空回答提示"请输入回答内容"', () => {
     renderQa('q1');
     fireEvent.click(screen.getByRole('button', { name: '发布' }));

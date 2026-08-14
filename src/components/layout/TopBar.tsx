@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
-import { Icons } from '@/lib/icons';
+import { Icon } from '@/components/common/Icon';
+import { Logo } from '@/components/common/Logo';
 import type { FeedTab } from '@/types';
 
 const TABS: { key: FeedTab; label: string }[] = [
@@ -10,19 +10,12 @@ const TABS: { key: FeedTab; label: string }[] = [
   { key: 'local', label: '同城' },
 ];
 
-/** 顶栏：Logo + 推荐/关注/同城 Tab + 铃铛（未读角标）+ 搜索图标（内联过滤） */
-export function TopBar({
-  search,
-  onSearchChange,
-}: {
-  search: string;
-  onSearchChange: (v: string) => void;
-}) {
+/** 顶栏：Logo + 推荐/关注/同城 Tab + 铃铛（未读角标）+ 搜索图标（跳转 /search） */
+export function TopBar() {
   const navigate = useNavigate();
   const activeTab = useAppStore((s) => s.activeTab);
   const setActiveTab = useAppStore((s) => s.setActiveTab);
   const notifications = useAppStore((s) => s.notifications);
-  const [showSearch, setShowSearch] = useState(false);
 
   const unread = notifications.filter((n) => !n.read).length;
 
@@ -30,7 +23,10 @@ export function TopBar({
     <header className="sticky top-0 z-10 bg-bg">
       <div className="flex h-[52px] items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <span className="text-lg font-bold text-brand">毛邻</span>
+          <span className="flex items-center gap-2 text-brand">
+            <Logo size={22} />
+            <span className="text-lg font-bold">毛邻</span>
+          </span>
           <nav className="flex items-center gap-1">
             {TABS.map((t) => (
               <button
@@ -51,7 +47,7 @@ export function TopBar({
             className="relative text-lg text-text-secondary"
             aria-label="通知"
           >
-            {Icons.bell}
+            <Icon name="bell" size={22} />
             {unread > 0 && (
               <span className="absolute -right-2 -top-1 rounded-full bg-[#E24B4A] px-1 text-[11px] leading-4 text-white">
                 {unread > 99 ? '99+' : unread}
@@ -59,25 +55,14 @@ export function TopBar({
             )}
           </button>
           <button
-            onClick={() => setShowSearch((s) => !s)}
+            onClick={() => navigate('/search')}
             className="text-lg text-text-secondary"
             aria-label="搜索"
           >
-            {Icons.search}
+            <Icon name="search" size={22} />
           </button>
         </div>
       </div>
-      {showSearch && (
-        <div className="px-4 pb-2">
-          <input
-            autoFocus
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="搜索当前列表内容"
-            className="transition-bg w-full rounded-button border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-brand"
-          />
-        </div>
-      )}
     </header>
   );
 }

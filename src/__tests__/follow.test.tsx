@@ -21,14 +21,14 @@ describe('关注关系（P0-2）', () => {
     expect(useAppStore.getState().currentUser.followingIds).toEqual(['u_lin', 'u_zhou']);
   });
 
-  it('FollowButton 未关注：显示「＋ 关注」，点击变「已关注」并写入 followingIds', () => {
+  it('FollowButton 未关注：显示「关注」，点击变「已关注」并写入 followingIds', () => {
     render(
       <MemoryRouter>
         <FollowButton userId="u_chen" />
       </MemoryRouter>,
     );
-    expect(screen.getByRole('button', { name: '＋ 关注' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: '＋ 关注' }));
+    expect(screen.getByRole('button', { name: '关注' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '关注' }));
     expect(screen.getByRole('button', { name: '已关注' })).toBeInTheDocument();
     expect(useAppStore.getState().currentUser.followingIds).toContain('u_chen');
   });
@@ -41,7 +41,7 @@ describe('关注关系（P0-2）', () => {
     );
     expect(screen.getByRole('button', { name: '已关注' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: '已关注' }));
-    expect(screen.getByRole('button', { name: '＋ 关注' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '关注' })).toBeInTheDocument();
     expect(useAppStore.getState().currentUser.followingIds).not.toContain('u_lin');
   });
 
@@ -64,8 +64,10 @@ describe('关注关系（P0-2）', () => {
         </Routes>
       </MemoryRouter>,
     );
-    // recommend 流中仅 post_2（u_chen）未关注 → 一个「＋ 关注」
-    const followBtns = screen.getAllByRole('button', { name: '＋ 关注' });
+    // recommend 流中未关注作者的卡片各有一个「关注」（排除顶栏「关注」Tab）
+    const followBtns = screen
+      .getAllByRole('button', { name: '关注' })
+      .filter((b) => b.closest('article'));
     expect(followBtns.length).toBeGreaterThan(0);
     fireEvent.click(followBtns[0]);
     // 未跳转到详情页，仍停留在 FeedPage

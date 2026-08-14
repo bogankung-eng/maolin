@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { NotificationIcon } from '@/lib/icons';
+import { Icon } from '@/components/common/Icon';
+import { EmptyState } from '@/components/common/EmptyState';
 import { formatRelativeTime } from '@/lib/time';
 import type { Notification } from '@/types';
 
@@ -35,32 +37,40 @@ export function NotificationPage() {
     <div className="min-h-full bg-surface">
       {/* 顶部返回栏 */}
       <header className="sticky top-0 z-10 flex h-[52px] items-center border-b border-border bg-surface px-4">
-        <button onClick={() => navigate(-1)} className="mr-3 text-text-secondary">
-          ←
+        <button
+          onClick={() => navigate(-1)}
+          className="mr-3 text-text-secondary"
+          aria-label="返回"
+        >
+          <Icon name="chevronLeft" size={20} />
         </button>
         <span className="text-base font-semibold text-text">通知</span>
       </header>
 
       {sorted.length === 0 ? (
-        <div className="py-10 text-center text-sm text-text-tertiary">暂时没有新通知</div>
+        <EmptyState title="暂时没有新通知" size="sm" />
       ) : (
         <div>
-          {sorted.map((n) => (
-            <button
-              key={n.id}
-              onClick={() => navigate(targetPath(n))}
-              className="flex w-full items-center gap-3 border-b border-border bg-surface px-4 py-3 text-left"
-            >
-              <span className="text-xl">{NotificationIcon[n.type]}</span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm text-text">{n.message}</span>
-                <span className="mt-0.5 block text-[11px] text-text-tertiary">
-                  {formatRelativeTime(n.createdAt)}
+          {sorted.map((n, i) => {
+            const TypeIcon = NotificationIcon[n.type];
+            return (
+              <button
+                key={n.id}
+                onClick={() => navigate(targetPath(n))}
+                className="animate-fade-up flex w-full items-center gap-3 border-b border-border bg-surface px-4 py-3 text-left"
+                style={{ animationDelay: `${i * 40}ms` }}
+              >
+                <TypeIcon size={20} />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm text-text">{n.message}</span>
+                  <span className="mt-0.5 block text-[11px] text-text-tertiary">
+                    {formatRelativeTime(n.createdAt)}
+                  </span>
                 </span>
-              </span>
-              {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-brand" />}
-            </button>
-          ))}
+                {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-brand" />}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

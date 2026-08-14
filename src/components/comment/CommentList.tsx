@@ -30,15 +30,23 @@ export function CommentList({ postId }: { postId: string }) {
 
   return (
     <div className="mt-2">
-      {topLevel.map((c) => {
+      {topLevel.map((c, idx) => {
         const replies = postComments
           .filter((r) => r.parentId === c.id)
           .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         return (
-          <div key={c.id} className="animate-fade-up">
+          <div
+            key={c.id}
+            className="animate-fade-up"
+            style={{ animationDelay: `${idx * 40}ms` }}
+          >
             <CommentItem comment={c} />
-            {replies.map((r) => (
-              <div key={r.id} className="animate-fade-up pl-8">
+            {replies.map((r, rIdx) => (
+              <div
+                key={r.id}
+                className="animate-fade-up pl-8"
+                style={{ animationDelay: `${rIdx * 40}ms` }}
+              >
                 <CommentItem comment={r} />
               </div>
             ))}

@@ -4,8 +4,9 @@ import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from '@/components/common/Avatar';
 import { Badge } from '@/components/common/Badge';
 import { Button } from '@/components/common/Button';
+import { Icon } from '@/components/common/Icon';
 import { getUserById } from '@/mock/data';
-import { CategoryLabel, CategoryColor, CategoryBg, Icons } from '@/lib/icons';
+import { CategoryLabel, CategoryColor, CategoryBg } from '@/lib/icons';
 import type { Answer } from '@/types';
 
 /** 问答详情：问题 + 回答列表 + 标记最佳/紧急 + 新增回答 */
@@ -14,6 +15,7 @@ export function QaDetailPage() {
   const navigate = useNavigate();
   const question = useAppStore((s) => s.questions.find((q) => q.id === id));
   const currentUser = useAppStore((s) => s.currentUser);
+  const pets = useAppStore((s) => s.pets);
   const markBestAnswer = useAppStore((s) => s.markBestAnswer);
   const markUrgent = useAppStore((s) => s.markUrgent);
   const addAnswer = useAppStore((s) => s.addAnswer);
@@ -34,6 +36,7 @@ export function QaDetailPage() {
   }
 
   const isOwner = question.authorId === currentUser.id;
+  const linkedPet = pets.find((p) => p.id === question.petId);
   const sortedAnswers = [...question.answers].sort(
     (a, b) => (b.isBest ? 1 : 0) - (a.isBest ? 1 : 0),
   );
@@ -60,8 +63,12 @@ export function QaDetailPage() {
     <div className="min-h-full bg-surface">
       {/* 顶部返回栏 */}
       <header className="sticky top-0 z-10 flex h-[52px] items-center border-b border-border bg-surface px-4">
-        <button onClick={() => navigate(-1)} className="mr-3 text-text-secondary">
-          ←
+        <button
+          onClick={() => navigate(-1)}
+          className="mr-3 text-text-secondary"
+          aria-label="返回"
+        >
+          <Icon name="chevronLeft" size={20} />
         </button>
         <span className="text-base font-semibold text-text">问答详情</span>
       </header>
@@ -69,15 +76,22 @@ export function QaDetailPage() {
       {/* 问题区 */}
       <div className="px-4 pt-4">
         <div className="flex items-center justify-between gap-2">
-          <span
-            className="rounded-pill px-2 py-0.5 text-xs"
-            style={{
-              color: CategoryColor[question.category],
-              background: CategoryBg[question.category],
-            }}
-          >
-            {CategoryLabel[question.category]}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className="rounded-pill px-2 py-0.5 text-xs"
+              style={{
+                color: CategoryColor[question.category],
+                background: CategoryBg[question.category],
+              }}
+            >
+              {CategoryLabel[question.category]}
+            </span>
+            {linkedPet && (
+              <span className="rounded-pill bg-brand-light px-2 py-0.5 text-xs text-brand">
+                {linkedPet.breedTag}
+              </span>
+            )}
+          </div>
           <Badge tone={statusBadge.tone}>{statusBadge.text}</Badge>
         </div>
         <h1 className="mt-2 text-base font-semibold leading-snug text-text">{question.title}</h1>
@@ -177,7 +191,7 @@ function AnswerCard({
         <span className="text-sm font-medium text-text">{author.name}</span>
         {answer.isVet && (
           <span className="flex items-center gap-0.5 text-xs font-semibold text-brand-dark">
-            {Icons.vet} 兽医
+            <Icon name="vet" size={14} /> 兽医
           </span>
         )}
         {answer.isBest && <Badge tone="resolved">最佳答案</Badge>}

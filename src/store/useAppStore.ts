@@ -23,6 +23,7 @@ import {
   seedHealthRecords,
   seedComments,
   seedNotifications,
+  rollHealthRecordDates,
 } from '@/mock/data';
 import {
   insertPostSync,
@@ -31,12 +32,19 @@ import {
   insertCommentSync,
 } from '@/api';
 
+/** 分享弹层视图态（不持久化） */
+interface ShareOverlay {
+  open: boolean;
+  postId: string | null;
+}
+
 /** 全局应用状态 */
 interface AppState {
   // —— 全局 / 应用态（不持久化）——
   currentUser: User;
   publishOverlay: { open: boolean; mode: PublishMode };
   toast: { message: string; visible: boolean };
+  shareOverlay: ShareOverlay;
 
   // —— 持久化数据 ——
   posts: Post[];
@@ -63,6 +71,12 @@ interface AppState {
   closePublish(): void;
   addPost(input: PostInput): void;
   addQuestion(input: QuestionInput): void;
+
+  /** 打开分享弹层（记录目标帖子） */
+  openShare(postId: string): void;
+  closeShare(): void;
+  /** 分享成功回写 post.shares +1（随 posts 持久化，无需新增键） */
+  incrementShare(postId: string): void;
 
   setQaCategory(c: Category | 'all'): void;
   setQaKeyword(k: string): void;
@@ -95,6 +109,7 @@ export const useAppStore = create<AppState>()(
       currentUser,
       publishOverlay: { open: false, mode: 'post' },
       toast: { message: '', visible: false },
+      shareOverlay: { open: false, postId: null },
       posts: seedPosts,
       questions: seedQuestions,
       pets: seedPets,
@@ -127,6 +142,12 @@ export const useAppStore = create<AppState>()(
       closePublish: () => set((s) => ({ publishOverlay: { ...s.publishOverlay, open: false } })),
       addPost: (input) => set((s) => ({ posts: [insertPostSync(input), ...s.posts] })),
       addQuestion: (input) => set((s) => ({ questions: [insertQuestionSync(input), ...s.questions] })),
+      openShare: (postId) => set({ shareOverlay: { open: true, postId } }),
+      closeShare: () => set((s) => ({ shareOverlay: { ...s.shareOverlay, open: false } })),
+      incrementShare: (postId) =>
+        set((s) => ({
+          posts: s.posts.map((p) => (p.id === postId ? { ...p, shares: p.shares + 1 } : p)),
+        })),
       addAnswer: (questionId, input) =>
         set((s) => ({
           questions: s.questions.map((q) =>
@@ -243,9 +264,9 @@ export const useAppStore = create<AppState>()(
           posts: validArr<Post>(p.posts) ? p.posts : current.posts,
           questions: validArr<Question>(p.questions) ? p.questions : current.questions,
           pets: validArr<Pet>(p.pets) ? p.pets : current.pets,
-          healthRecords: validArr<HealthRecord>(p.healthRecords)
-            ? p.healthRecords
-            : current.healthRecords,
+          healthRecords: rollHealthRecordDates(
+            validArr<HealthRecord>(p.healthRecords) ? p.healthRecords : current.healthRecords,
+          ),
           comments: validArr<Comment>(p.comments) ? p.comments : current.comments,
           notifications: validArr<Notification>(p.notifications)
             ? p.notifications

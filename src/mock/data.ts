@@ -8,6 +8,7 @@ import type {
   Notification,
   PostInput,
   QuestionInput,
+  LocalEntry,
 } from '@/types';
 
 // ============ ID 生成 ============
@@ -94,15 +95,63 @@ export const seedPets: Pet[] = [
 // ============ 种子健康记录（覆盖 normal / due-soon / overdue / none） ============
 const NOW = new Date();
 const DAY = 86400000;
-const inDays = (d: number): string => new Date(NOW.getTime() + d * DAY).toISOString();
 const daysAgo = (d: number): string => new Date(NOW.getTime() - d * DAY).toISOString();
 
-export const seedHealthRecords: HealthRecord[] = [
-  { id: 'h1', petId: 'p1', type: 'vaccine', title: '狂犬疫苗', date: inDays(60) }, // >30 天 -> normal
-  { id: 'h2', petId: 'p1', type: 'deworm', title: '体内驱虫', date: inDays(10) }, // ≤30 天 -> due-soon
-  { id: 'h3', petId: 'p2', type: 'vaccine', title: '猫三联', date: daysAgo(5) }, // 已超期 -> overdue
-  { id: 'h4', petId: 'p2', type: 'weight', title: '体重记录', value: '4.8kg' }, // 无日期体重 -> normal
-  { id: 'h5', petId: 'p3', type: 'vaccine', title: '年度体检', date: undefined }, // 无日期非体重 -> none
+/** seed id → 相对天数偏移（正=未来到期、负=已超期、null=无日期） */
+const HEALTH_SEED_OFFSET: Record<string, number | null> = {
+  h1: 60, // >30 天 -> normal
+  h2: 10, // ≤30 天 -> due-soon
+  h3: -5, // 已超期 -> overdue
+  h4: null, // 无日期体重 -> normal
+  h5: null, // 无日期非体重 -> none
+};
+
+/** 基础健康记录（date 为占位，由 rollHealthRecordDates 重锚定） */
+const baseHealthRecords: HealthRecord[] = [
+  { id: 'h1', petId: 'p1', type: 'vaccine', title: '狂犬疫苗', date: undefined },
+  { id: 'h2', petId: 'p1', type: 'deworm', title: '体内驱虫', date: undefined },
+  { id: 'h3', petId: 'p2', type: 'vaccine', title: '猫三联', date: undefined },
+  { id: 'h4', petId: 'p2', type: 'weight', title: '体重记录', value: '4.8kg' },
+  { id: 'h5', petId: 'p3', type: 'vaccine', title: '年度体检', date: undefined },
+];
+
+/**
+ * 按当前时间重锚定种子日期；非 seed id 记录原样保留。
+ * 保证 normal / due-soon / overdue / none 四种演示状态永远稳定（工程 E6）。
+ */
+export function rollHealthRecordDates(records: HealthRecord[]): HealthRecord[] {
+  const now = Date.now();
+  return records.map((r) => {
+    const off = HEALTH_SEED_OFFSET[r.id];
+    if (off === undefined || off === null) return r;
+    return { ...r, date: new Date(now + off * DAY).toISOString() };
+  });
+}
+
+export const seedHealthRecords: HealthRecord[] = rollHealthRecordDates(baseHealthRecords);
+
+// ============ 热门话题标签（发帖多选来源 + 话题页/搜索聚合） ============
+export const hotTags: string[] = [
+  '日常', '训练', '测评', '同城', '聚会', '分享', '庆祝',
+  '疫苗', '饮食', '行为', '装备', '医疗', '健康',
+];
+
+/** mock 城市列表（同城 LBS 城市选择器，不调 geolocation） */
+export const CITIES: string[] = ['杭州', '上海', '北京', '广州', '深圳'];
+
+/** 同城种子条目（4 分区 × 多城市，默认城市杭州每区 ≥2 条） */
+export const seedLocalEntries: LocalEntry[] = [
+  { id: 'l1', section: 'hospital', city: '杭州', title: '安心宠物医院', subtitle: '距你 1.2km · 24 小时急诊', emoji: '🏥' },
+  { id: 'l2', section: 'hospital', city: '上海', title: '仁心动物医院', subtitle: '三甲兽医坐诊', emoji: '🏥' },
+  { id: 'l3', section: 'play', city: '杭州', title: '西湖遛狗团', subtitle: '周六 9:00 · 已 12 人', emoji: '🎾' },
+  { id: 'l4', section: 'shop', city: '杭州', title: '喵星球宠物店', subtitle: '洗澡美容 8 折', emoji: '🏪' },
+  { id: 'l5', section: 'friend', city: '杭州', title: '柯基家长群', subtitle: '同品种找玩伴', emoji: '🤝' },
+  { id: 'l6', section: 'friend', city: '北京', title: '英短猫友会', subtitle: '北京朝阳区', emoji: '🤝' },
+  // —— 补齐默认城市（杭州）每分区 ≥2 条 ——
+  { id: 'l7', section: 'hospital', city: '杭州', title: '康宁宠物诊所', subtitle: '疫苗体检预约中', emoji: '🏥' },
+  { id: 'l8', section: 'play', city: '杭州', title: '滨江狗狗公园', subtitle: '周日 15:00 · 已 8 人', emoji: '🎾' },
+  { id: 'l9', section: 'shop', city: '杭州', title: '爪爪生活馆', subtitle: '零食玩具满减', emoji: '🏪' },
+  { id: 'l10', section: 'friend', city: '杭州', title: '柴犬家长群', subtitle: '同品种找玩伴', emoji: '🤝' },
 ];
 
 // ============ 种子帖子（覆盖 recommend / following / local 三种 source） ============
@@ -403,6 +452,7 @@ export function makePost(input: PostInput): Post {
     id: genId(),
     authorId: currentUser.id,
     petTag: input.petTag,
+    petId: input.petId,
     category: input.category,
     content: input.content,
     images: input.images ?? [],
@@ -424,6 +474,7 @@ export function makeQuestion(input: QuestionInput): Question {
     category: input.category,
     title: input.title,
     content: input.content,
+    petId: input.petId,
     answers: [],
     status: 'open',
     createdAt: new Date().toISOString(),

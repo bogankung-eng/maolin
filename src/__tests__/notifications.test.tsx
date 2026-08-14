@@ -57,7 +57,7 @@ describe('通知中心（P0-4）', () => {
     useAppStore.setState({ activeTab: 'recommend', activeCategory: 'all' });
     render(
       <MemoryRouter>
-        <TopBar search="" onSearchChange={() => {}} />
+        <TopBar />
       </MemoryRouter>,
     );
     expect(screen.getByText('3')).toBeInTheDocument();

@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
-import { Icons } from '@/lib/icons';
+import { Icon } from '@/components/common/Icon';
 import type { FeedTab } from '@/types';
 
 /**
@@ -34,11 +34,11 @@ export function BottomNav() {
         className={itemClass(isFeed && activeTab === 'recommend')}
         onClick={() => goFeed('recommend')}
       >
-        <span className="text-xl">{Icons.home}</span>
+        <span className="text-xl"><Icon name="home" size={22} /></span>
         <span>首页</span>
       </button>
       <button className={itemClass(isQa)} onClick={() => navigate('/qa')}>
-        <span className="text-xl">{Icons.chat}</span>
+        <span className="text-xl"><Icon name="chat" size={22} /></span>
         <span>问答</span>
       </button>
 
@@ -49,7 +49,7 @@ export function BottomNav() {
         aria-label="发布"
       >
         <span className="flex h-12 w-12 items-center justify-center rounded-button bg-brand text-2xl text-white shadow-[0_4px_12px_rgba(29,158,117,0.4)]">
-          {Icons.plus}
+          <Icon name="plus" size={26} />
         </span>
       </button>
 
@@ -57,11 +57,11 @@ export function BottomNav() {
         className={itemClass(isFeed && activeTab === 'local')}
         onClick={() => goFeed('local')}
       >
-        <span className="text-xl">{Icons.location}</span>
+        <span className="text-xl"><Icon name="location" size={22} /></span>
         <span>同城</span>
       </button>
       <button className={itemClass(isProfile)} onClick={() => navigate('/profile')}>
-        <span className="text-xl">{Icons.user}</span>
+        <span className="text-xl"><Icon name="user" size={22} /></span>
         <span>我的</span>
       </button>
     </nav>

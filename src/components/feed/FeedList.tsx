@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PostCard } from './PostCard';
 import { api } from '@/api';
 import type { Post } from '@/types';
@@ -57,7 +57,9 @@ export function FeedList({ posts }: { posts: Post[] }) {
     visibleRef.current = visible;
   }, [visible]);
 
-  const loadMore = () => {
+  // loadMore 只依赖 refs / setter / 模块常量（均稳定），useCallback 保持引用稳定，
+  // 使 IO 回调无需用 ref 缓存最新函数（规避 react-hooks/refs 的 ref-in-render 问题）。
+  const loadMore = useCallback(() => {
     if (loadingRef.current) return;
     const list = listRef.current;
     if (visibleRef.current >= list.length) return;
@@ -75,25 +77,21 @@ export function FeedList({ posts }: { posts: Post[] }) {
       setLoading(false);
       setVisible((v) => Math.min(v + result.length, list.length));
     });
-  };
+  }, []);
 
-  const loadMoreRef = useRef(loadMore);
-  loadMoreRef.current = loadMore;
-
-  // 触底加载更多（IntersectionObserver，仅依赖 [posts] 重建）
+  // 触底加载更多（IntersectionObserver，仅依赖 [posts] 重建；loadMore 引用稳定不触发重建）
   useEffect(() => {
     const el = sentinel.current;
     if (!el) return;
     const io = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) loadMoreRef.current();
+        if (entries[0].isIntersecting) loadMore();
       },
       { rootMargin: '120px' },
     );
     io.observe(el);
     return () => io.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [posts]);
+  }, [posts, loadMore]);
 
   const doRefresh = () => {
     if (refreshingRef.current) return;
@@ -130,7 +128,11 @@ export function FeedList({ posts }: { posts: Post[] }) {
     <div onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
       {refreshing && <div className="py-2 text-center text-xs text-text-tertiary">刷新中…</div>}
       {shown.map((p, i) => (
-        <div key={p.id} className="animate-fade-up" style={{ animationDelay: `${i * 60}ms` }}>
+        <div
+          key={p.id}
+          className="animate-fade-up"
+          style={{ animationDelay: `${(i % PAGE) * 60}ms` }}
+        >
           <PostCard post={p} />
         </div>
       ))}

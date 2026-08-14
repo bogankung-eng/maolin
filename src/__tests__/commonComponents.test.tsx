@@ -74,9 +74,9 @@ describe('Avatar 头像', () => {
 });
 
 describe('Icon 图标', () => {
-  it('渲染指定图标 emoji', () => {
-    render(<Icon name="heartFill" />);
-    expect(screen.getByText('❤️')).toBeInTheDocument();
+  it('渲染指定图标为 Lucide SVG', () => {
+    const { container } = render(<Icon name="heartFill" />);
+    expect(container.querySelector('svg')).not.toBeNull();
   });
 });
 

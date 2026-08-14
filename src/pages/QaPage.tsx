@@ -3,7 +3,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { CategoryFilter } from '@/components/layout/CategoryFilter';
 import { QaList } from '@/components/qa/QaList';
 import { QaStatusFilter } from '@/components/qa/QaStatusFilter';
-import { Icons } from '@/lib/icons';
+import { Icon } from '@/components/common/Icon';
 import type { QaFilter } from '@/types';
 
 /** 问答社区：提问入口 + 分类 + 状态筛选 + 列表 + 搜索 */
@@ -46,13 +46,14 @@ export function QaPage() {
               className="text-lg text-text-secondary"
               aria-label="搜索"
             >
-              {Icons.search}
+              <Icon name="search" size={22} />
             </button>
             <button
               onClick={() => openPublish('question')}
-              className="rounded-button bg-brand px-3 py-1 text-sm text-white"
+              className="flex items-center gap-1 rounded-button bg-brand px-3 py-1 text-sm text-white"
             >
-              提问＋
+              <Icon name="plus" size={14} />
+              提问
             </button>
           </div>
         </div>
