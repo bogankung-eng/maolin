@@ -5,7 +5,7 @@ import { HealthRecordList } from '@/components/profile/HealthRecordList';
 import { PostCard } from '@/components/feed/PostCard';
 import { Icon } from '@/components/common/Icon';
 import { EmptyState } from '@/components/common/EmptyState';
-import { computeHealthStatus } from '@/types';
+import { computeHealthStatus } from '@/lib/health';
 import { formatDate } from '@/lib/mockApi';
 import type { HealthType } from '@/types';
 

@@ -10,9 +10,8 @@ import type {
   QuestionInput,
   LocalEntry,
 } from '@/types';
-
-// ============ ID 生成 ============
-export const genId = (): string => 'id_' + Math.random().toString(36).slice(2, 10);
+import { genId } from '@/lib/id';
+import { buildUserMap, type UserMap } from '@/lib/userMap';
 
 // ============ 当前用户（固定 mock，本期无登录注册） ============
 export const currentUser: User = {
@@ -54,12 +53,15 @@ const u_chen: User = {
   followingIds: [],
 };
 
-/** 全部用户集合，供 getUserById 解析作者 */
+/** 全部用户集合，供 getUserById / buildUserMap 解析作者 */
 export const users: User[] = [currentUser, u_lin, u_zhou, u_chen];
 
-/** 根据 id 解析用户，未命中回退到当前用户 */
+/** 用户 id -> User 的 O(1) 索引（工程 E9） */
+export const userMap: UserMap = buildUserMap(users);
+
+/** 根据 id 解析用户，未命中回退到当前用户（O(1)） */
 export function getUserById(id: string): User {
-  return users.find((u) => u.id === id) ?? currentUser;
+  return userMap[id] ?? currentUser;
 }
 
 // ============ 种子宠物 ============

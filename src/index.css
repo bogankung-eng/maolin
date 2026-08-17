@@ -15,7 +15,7 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url('/fonts/noto-sans-sc-500.woff2') format('woff2');
+  src: url('/fonts/noto-sans-sc-400.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Noto Sans SC';
@@ -69,16 +69,36 @@
   /* 动效 */
   --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
 
-  /* —— 预留深色变量（本期不启用，留空待填）—— */
-  /*
-  --color-brand-darkmode: #...;
-  --color-bg-darkmode: #...;
-  --color-surface-darkmode: #...;
-  --color-text-darkmode: #...;
-  --color-text-secondary-darkmode: #...;
-  --color-text-tertiary-darkmode: #...;
-  --color-border-darkmode: #...;
-  */
+  /* 画布底色（桌面端 420px 手机画布外的底色，唯一新增 Token） */
+  --color-canvas: #eceae4;
+}
+
+/* —— 深色覆盖（CSS 变量方案，组件 class 零改动；品牌绿 hue 不变仅调明度）—— */
+[data-theme='dark'] {
+  --color-canvas: #101012;
+  --color-bg: #1a1a1c;
+  --color-surface: #232326;
+  --color-text: #ecece9;
+  --color-text-secondary: #a3a3a0;
+  --color-text-tertiary: #71716f;
+  --color-border: #333336;
+  --color-brand: #2fbf8f;
+  --color-brand-light: #163c31;
+  --color-brand-dark: #7be0bd;
+  --color-warning: #f2b14d;
+  --color-warning-bg: #3a2d18;
+  --color-danger: #ec7a4f;
+  --color-danger-bg: #3a2118;
+  --color-behavior: #8f85e8;
+  --color-behavior-bg: #262240;
+  --color-gear: #6fa8e0;
+  --color-gear-bg: #16283a;
+  --color-error: #ef6b6b;
+  --color-error-bg: #3a1c1c;
+  --color-resolved-bg: #1e2a16;
+  --color-resolved-text: #9fc46e;
+  --color-urgent-bg: #3a1c1c;
+  --color-urgent-text: #ef9a9a;
 }
 
 html,
@@ -91,7 +111,7 @@ body {
   margin: 0;
   font-family: 'Noto Sans SC', system-ui, sans-serif;
   /* 桌面端手机画布外的底色 */
-  background: #eceae4;
+  background: var(--color-canvas);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
 }
@@ -135,6 +155,17 @@ body {
   .animate-breathe {
     animation: breathe 600ms var(--ease) infinite;
   }
+  /* 骨架屏 shimmer（1.4s 循环，不受 300ms 入场规范约束） */
+  .animate-shimmer {
+    background: linear-gradient(
+      100deg,
+      var(--color-border) 40%,
+      var(--color-surface) 50%,
+      var(--color-border) 60%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s var(--ease) infinite;
+  }
   /* 隐藏滚动条但保留滚动能力 */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -153,6 +184,10 @@ body {
   }
   .h-safe-nav {
     height: calc(72px + env(safe-area-inset-bottom));
+  }
+  /* Toast 定位 Token：替代裸 bottom-24 */
+  .bottom-toast {
+    bottom: calc(72px + env(safe-area-inset-bottom) + 12px);
   }
 }
 
@@ -238,6 +273,14 @@ body {
   }
   50% {
     transform: scale(1.06);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }
 /* 错开 60ms：在组件上用 style={{ animationDelay: `${i * 60}ms` }} */

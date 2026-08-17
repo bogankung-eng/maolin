@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeHealthStatus } from '@/types';
+import { computeHealthStatus } from '@/lib/health';
 import type { HealthRecord } from '@/types';
 
 const DAY = 86400000;

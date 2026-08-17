@@ -26,7 +26,6 @@ export function SearchPage() {
   const questions = useAppStore((s) => s.questions);
   const pets = useAppStore((s) => s.pets);
   const openPublish = useAppStore((s) => s.openPublish);
-  const showToast = useAppStore((s) => s.showToast);
   const [keyword, setKeyword] = useState('');
   const [tab, setTab] = useState<SearchTab>('all');
 
@@ -138,7 +137,7 @@ export function SearchPage() {
           {(tab === 'all' || tab === 'user') && matchedUsers.length > 0 && (
             <Section title="用户">
               {matchedUsers.map((u) => (
-                <UserRow key={u.id} user={u} onOpen={() => showToast('个人主页开发中')} />
+                <UserRow key={u.id} user={u} onOpen={() => navigate(`/user/${u.id}`)} />
               ))}
             </Section>
           )}

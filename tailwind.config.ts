@@ -15,6 +15,7 @@ export default {
         'text-secondary': 'var(--color-text-secondary)',
         'text-tertiary': 'var(--color-text-tertiary)',
         border: 'var(--color-border)',
+        canvas: 'var(--color-canvas)',
         warning: 'var(--color-warning)',
         'warning-bg': 'var(--color-warning-bg)',
         danger: 'var(--color-danger)',

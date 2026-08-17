@@ -8,8 +8,22 @@
     />
     <title>毛邻 · 宠物社区</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- 字体 self-host（工程 E2）：本地 woff2 尚未落盘，先不 preload 避免生产 404；
-         @font-face（src/index.css）保留 font-display:swap + system-ui 回退，字体补齐后再恢复 preload -->
+    <!-- 字体 self-host（工程 E2）：本地 woff2 子集（400+700），preload 提速首屏；
+         @font-face（src/index.css）font-display:swap + system-ui 回退，文件缺失时不影响运行 -->
+    <link
+      rel="preload"
+      href="/fonts/noto-sans-sc-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/noto-sans-sc-700.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
   </head>
   <body>
     <div id="root"></div>

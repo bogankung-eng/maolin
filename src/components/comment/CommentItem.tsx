@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from '@/components/common/Avatar';
-import { getUserById } from '@/mock/data';
+import { userMap, currentUser } from '@/mock/data';
 import { formatRelativeTime } from '@/lib/time';
 import type { Comment } from '@/types';
 
@@ -11,7 +12,7 @@ import type { Comment } from '@/types';
  * 子回复（parentId 有值）不显示「回复」按钮（不嵌套二级及以上）。
  */
 export function CommentItem({ comment }: { comment: Comment }) {
-  const author = getUserById(comment.authorId);
+  const author = userMap[comment.authorId] ?? currentUser;
   const addComment = useAppStore((s) => s.addComment);
   const showToast = useAppStore((s) => s.showToast);
   const [replying, setReplying] = useState(false);
@@ -37,7 +38,9 @@ export function CommentItem({ comment }: { comment: Comment }) {
         <Avatar emoji={author.avatarEmoji} size={32} />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <span className="truncate text-[13px] font-medium text-text">{author.name}</span>
+            <Link to={`/user/${comment.authorId}`} className="truncate text-[13px] font-medium text-text">
+              {author.name}
+            </Link>
             <span className="shrink-0 text-[11px] text-text-tertiary">
               {formatRelativeTime(comment.createdAt)}
             </span>

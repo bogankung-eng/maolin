@@ -1,4 +1,4 @@
-import { computeHealthStatus } from '@/types';
+import { computeHealthStatus } from '@/lib/health';
 import { formatDate } from '@/lib/mockApi';
 import type { HealthRecord, HealthStatus } from '@/types';
 

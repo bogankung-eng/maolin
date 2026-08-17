@@ -61,10 +61,13 @@ export function FeedPage() {
                 关注感兴趣的主人来这里看 TA 的动态
               </div>
             </div>
-            <FeedList posts={fallbackPosts} />
+            <FeedList posts={fallbackPosts} variant="compact" />
           </>
         ) : (
-          <FeedList posts={filtered} />
+          <FeedList
+            posts={filtered}
+            variant={activeTab === 'following' ? 'compact' : 'full'}
+          />
         )}
       </div>
     </div>

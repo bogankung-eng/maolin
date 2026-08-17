@@ -3,10 +3,12 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from '@/components/common/Avatar';
 import { FollowButton } from '@/components/common/FollowButton';
+import { FavoriteButton } from '@/components/common/FavoriteButton';
 import { CommentList } from '@/components/comment/CommentList';
 import { Icon } from '@/components/common/Icon';
-import { getUserById } from '@/mock/data';
+import { userMap, currentUser } from '@/mock/data';
 import { isRealImage } from '@/lib/image';
+import { safeVibrate } from '@/lib/vibrate';
 
 /**
  * 帖子详情：大图 + 正文 + 操作栏 + 作者关注 + 评论（列表/发送/楼主一级回复）。
@@ -37,13 +39,14 @@ export function PostDetailPage() {
     );
   }
 
-  const author = getUserById(post.authorId);
+  const author = userMap[post.authorId] ?? currentUser;
   const pet = pets.find((p) => p.id === post.petId);
   const image = post.images[0];
   const isReal = image ? isRealImage(image) : false;
 
   const handleLike = () => {
     toggleLike(post.id);
+    safeVibrate(15);
     setBounce(true);
     window.setTimeout(() => setBounce(false), 200);
   };
@@ -78,7 +81,9 @@ export function PostDetailPage() {
         <div className="flex min-w-0 items-center gap-2">
           <Avatar emoji={author.avatarEmoji} size={40} />
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-text">{author.name}</span>
+            <Link to={`/user/${post.authorId}`} className="text-sm font-medium text-text">
+              {author.name}
+            </Link>
             <div className="flex items-center gap-1">
               {post.petTag && <span className="text-xs text-text-secondary">{post.petTag}</span>}
               {pet && (
@@ -152,6 +157,9 @@ export function PostDetailPage() {
           <Icon name="share" size={18} />
           <span>{post.shares}</span>
         </button>
+        <span className="ml-auto">
+          <FavoriteButton type="post" id={post.id} />
+        </span>
       </div>
 
       {/* 评论区：真实列表 + 发送 + 楼主一级回复 */}

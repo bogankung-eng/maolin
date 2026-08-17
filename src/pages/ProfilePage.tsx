@@ -6,10 +6,13 @@ import { Icon } from '@/components/common/Icon';
 import { PetCard } from '@/components/profile/PetCard';
 import { PetForm } from '@/components/profile/PetForm';
 import { HealthRecordList } from '@/components/profile/HealthRecordList';
+import { PostCard } from '@/components/feed/PostCard';
+import { QaItem } from '@/components/qa/QaItem';
 import { deriveUserStats } from '@/lib/stats';
 import { isRealImage } from '@/lib/image';
+import type { Post, Question } from '@/types';
 
-/** 我的：个人信息 / 统计 / 宠物 / 健康 / 动态九宫格 */
+/** 我的：个人信息 / 统计 / 宠物 / 健康 / 动态·收藏分段 */
 export function ProfilePage() {
   const navigate = useNavigate();
   const currentUser = useAppStore((s) => s.currentUser);
@@ -17,14 +20,26 @@ export function ProfilePage() {
   const healthRecords = useAppStore((s) => s.healthRecords);
   const posts = useAppStore((s) => s.posts);
   const questions = useAppStore((s) => s.questions);
+  const favorites = useAppStore((s) => s.favorites);
   const [petFormOpen, setPetFormOpen] = useState(false);
+  const [section, setSection] = useState<'posts' | 'favorites'>('posts');
 
   const myPosts = posts.filter((p) => p.authorId === currentUser.id);
+
+  // 收藏项解析为可渲染实体（帖子/问答），缺失实体自动跳过
+  const favoritePosts = favorites
+    .filter((f) => f.type === 'post')
+    .map((f) => posts.find((p) => p.id === f.id))
+    .filter((p): p is Post => p != null);
+  const favoriteQuestions = favorites
+    .filter((f) => f.type === 'question')
+    .map((f) => questions.find((q) => q.id === f.id))
+    .filter((q): q is Question => q != null);
 
   // 统计真实化（F5）：动态/回答派生、关注=followingIds.length、粉丝固定 230
   const derived = deriveUserStats(currentUser, posts, questions);
   const stats = [
-    { label: '动态', value: derived.posts },
+    { label: '帖子', value: derived.posts },
     { label: '粉丝', value: derived.fans },
     { label: '关注', value: derived.following },
     { label: '回答', value: derived.answers },
@@ -78,34 +93,70 @@ export function ProfilePage() {
         <HealthRecordList records={healthRecords} />
       </section>
 
-      {/* 动态九宫格 */}
+      {/* 动态 / 收藏 分段 */}
       <section className="mb-8 mt-6 px-4">
         <h2 className="mb-2 text-sm font-semibold text-text">我的动态</h2>
-        {myPosts.length === 0 ? (
-          <div className="text-sm text-text-tertiary">还没有动态，去发布一条吧～</div>
+        <div className="mb-3 flex gap-2">
+          <button
+            onClick={() => setSection('posts')}
+            className={`transition-bg rounded-pill border px-3 py-1 text-xs ${
+              section === 'posts'
+                ? 'border-brand bg-brand text-white'
+                : 'border-border bg-surface text-text-secondary'
+            }`}
+          >
+            动态
+          </button>
+          <button
+            onClick={() => setSection('favorites')}
+            className={`transition-bg rounded-pill border px-3 py-1 text-xs ${
+              section === 'favorites'
+                ? 'border-brand bg-brand text-white'
+                : 'border-border bg-surface text-text-secondary'
+            }`}
+          >
+            收藏
+          </button>
+        </div>
+
+        {section === 'posts' ? (
+          myPosts.length === 0 ? (
+            <div className="text-sm text-text-tertiary">还没有动态，去发布一条吧～</div>
+          ) : (
+            <div className="grid grid-cols-3 gap-1">
+              {myPosts.slice(0, 9).map((p) => {
+                const img = p.images[0];
+                const isReal = isRealImage(img);
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => navigate(`/post/${p.id}`)}
+                    className="flex aspect-square items-center justify-center overflow-hidden rounded-button bg-bg"
+                  >
+                    {isReal ? (
+                      <img src={img} alt="" className="h-full w-full object-cover" />
+                    ) : img ? (
+                      <span className="text-3xl">{img}</span>
+                    ) : (
+                      <span className="line-clamp-2 px-1 text-center text-xs text-text-tertiary">
+                        {p.content.slice(0, 12)}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )
+        ) : favoritePosts.length === 0 && favoriteQuestions.length === 0 ? (
+          <div className="text-sm text-text-tertiary">还没有收藏，去收藏一些内容吧～</div>
         ) : (
-          <div className="grid grid-cols-3 gap-1">
-            {myPosts.slice(0, 9).map((p) => {
-              const img = p.images[0];
-              const isReal = isRealImage(img);
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => navigate(`/post/${p.id}`)}
-                  className="flex aspect-square items-center justify-center overflow-hidden rounded-button bg-bg"
-                >
-                  {isReal ? (
-                    <img src={img} alt="" className="h-full w-full object-cover" />
-                  ) : img ? (
-                    <span className="text-3xl">{img}</span>
-                  ) : (
-                    <span className="line-clamp-2 px-1 text-center text-xs text-text-tertiary">
-                      {p.content.slice(0, 12)}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+          <div>
+            {favoritePosts.map((p) => (
+              <PostCard key={p.id} post={p} />
+            ))}
+            {favoriteQuestions.map((q) => (
+              <QaItem key={q.id} question={q} />
+            ))}
           </div>
         )}
       </section>

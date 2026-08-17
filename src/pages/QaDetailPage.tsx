@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Avatar } from '@/components/common/Avatar';
 import { Badge } from '@/components/common/Badge';
 import { Button } from '@/components/common/Button';
 import { Icon } from '@/components/common/Icon';
-import { getUserById } from '@/mock/data';
+import { FavoriteButton } from '@/components/common/FavoriteButton';
+import { userMap, currentUser } from '@/mock/data';
 import { CategoryLabel, CategoryColor, CategoryBg } from '@/lib/icons';
 import type { Answer } from '@/types';
 
@@ -94,7 +95,10 @@ export function QaDetailPage() {
           </div>
           <Badge tone={statusBadge.tone}>{statusBadge.text}</Badge>
         </div>
-        <h1 className="mt-2 text-base font-semibold leading-snug text-text">{question.title}</h1>
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <h1 className="text-base font-semibold leading-snug text-text">{question.title}</h1>
+          <FavoriteButton type="question" id={question.id} size="sm" />
+        </div>
         {question.content && (
           <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
             {question.content}
@@ -183,12 +187,14 @@ function AnswerCard({
   canMarkBest: boolean;
   onMarkBest: () => void;
 }) {
-  const author = getUserById(answer.authorId);
+  const author = userMap[answer.authorId] ?? currentUser;
   return (
     <div className="rounded-button bg-bg p-3">
       <div className="flex items-center gap-2">
         <Avatar emoji={author.avatarEmoji} size={32} />
-        <span className="text-sm font-medium text-text">{author.name}</span>
+        <Link to={`/user/${answer.authorId}`} className="text-sm font-medium text-text">
+          {author.name}
+        </Link>
         {answer.isVet && (
           <span className="flex items-center gap-0.5 text-xs font-semibold text-brand-dark">
             <Icon name="vet" size={14} /> 兽医

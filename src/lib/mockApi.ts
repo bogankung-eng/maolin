@@ -1,5 +1,6 @@
 import type { Post, Question, Answer, PostInput, QuestionInput, AnswerInput } from '@/types';
 import { makePost, makeQuestion, seedPosts } from '@/mock/data';
+import { genId } from '@/lib/id';
 
 /** 模拟网络延时（200-400ms） */
 export function delay(ms: number = 300): Promise<void> {
@@ -39,7 +40,7 @@ export async function insertQuestion(input: QuestionInput): Promise<Question> {
 export async function insertAnswer(questionId: string, input: AnswerInput): Promise<Answer> {
   await delay(300);
   return {
-    id: 'id_' + Math.random().toString(36).slice(2, 10),
+    id: genId(),
     questionId,
     authorId: 'u_me',
     isVet: input.isVet ?? false,

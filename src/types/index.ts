@@ -19,6 +19,10 @@ export type QaFilter = 'all' | QaStatus;
 export type LocalSection = 'hospital' | 'play' | 'shop' | 'friend';
 /** 全局搜索分类 Tab */
 export type SearchTab = 'all' | 'post' | 'question' | 'user' | 'pet';
+/** 收藏类型：帖子 / 问答 */
+export type FavoriteType = 'post' | 'question';
+/** 主题模式（独立 key 持久化，不进 persist 主键） */
+export type ThemeMode = 'light' | 'dark' | 'system';
 
 // ============ 实体 ============
 
@@ -139,6 +143,13 @@ export interface Question {
   createdAt: string;
 }
 
+/** 收藏项（持久化字段，按「收藏/稍后看」语义，非布尔） */
+export interface FavoriteItem {
+  type: FavoriteType;
+  id: string; // post.id 或 question.id
+  savedAt: string; // ISO，收藏时间
+}
+
 // ============ 视图辅助 / 输入 ============
 /** 发帖输入 */
 export interface PostInput {
@@ -164,17 +175,4 @@ export interface AnswerInput {
 }
 
 // ============ 派生计算 ============
-/**
- * 根据健康记录的提醒日期与当前时间，计算健康状态。
- * - 无日期：体重类视为 normal，其余视为 none
- * - 已超期（date 早于 now）：overdue
- * - 30 天内到期（含今天）：due-soon
- * - 超过 30 天：normal
- */
-export function computeHealthStatus(rec: HealthRecord, now: Date = new Date()): HealthStatus {
-  if (!rec.date) return rec.type === 'weight' ? 'normal' : 'none';
-  const diffDays = Math.floor((new Date(rec.date).getTime() - now.getTime()) / 86400000);
-  if (diffDays < 0) return 'overdue'; // 已超期
-  if (diffDays <= 30) return 'due-soon'; // 30 天内到期
-  return 'normal'; // 超过 30 天正常
-}
+// 注：computeHealthStatus 已迁移至 @/lib/health（工程 E3），本文件仅保留类型定义。

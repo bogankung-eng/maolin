@@ -18,6 +18,7 @@ export function PublishSheet() {
   const addPost = useAppStore((s) => s.addPost);
   const addQuestion = useAppStore((s) => s.addQuestion);
   const showToast = useAppStore((s) => s.showToast);
+  const showPublishGuide = useAppStore((s) => s.showPublishGuide);
   const pets = useAppStore((s) => s.pets);
 
   // 发帖内容
@@ -84,6 +85,7 @@ export function PublishSheet() {
         source: 'recommend',
       });
       showToast('发布成功');
+      showPublishGuide();
     } else {
       const t = title.trim();
       if (!t) {

@@ -14,6 +14,7 @@ const PetDetailPage = lazy(() => import('./pages/PetDetailPage').then((m) => ({ 
 const NotificationPage = lazy(() => import('./pages/NotificationPage').then((m) => ({ default: m.NotificationPage })));
 const SearchPage = lazy(() => import('./pages/SearchPage').then((m) => ({ default: m.SearchPage })));
 const TopicPage = lazy(() => import('./pages/TopicPage').then((m) => ({ default: m.TopicPage })));
+const UserProfilePage = lazy(() => import('./pages/UserProfilePage').then((m) => ({ default: m.UserProfilePage })));
 
 const withSuspense = (node: ReactNode) => (
   <Suspense fallback={<PageFallback />}>{node}</Suspense>
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { path: 'notifications', element: withSuspense(<NotificationPage />) },
       { path: 'search', element: withSuspense(<SearchPage />) },
       { path: 'topic/:tag', element: withSuspense(<TopicPage />) },
+      { path: 'user/:id', element: withSuspense(<UserProfilePage />) },
     ],
   },
 ]);

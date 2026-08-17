@@ -25,6 +25,10 @@ import {
   ChevronRight,
   X,
   ArrowRight,
+  Bookmark,
+  Sun,
+  Moon,
+  Monitor,
 } from 'lucide-react';
 import type { Category, NotificationType, LocalSection } from '@/types';
 
@@ -47,6 +51,11 @@ export const Icons = {
   chevronRight: ChevronRight,
   x: X,
   arrowRight: ArrowRight,
+  // —— V5 新增（收藏 / 主题三态）——
+  bookmark: Bookmark,
+  sun: Sun,
+  moon: Moon,
+  monitor: Monitor,
 } as const satisfies Record<string, LucideIcon>;
 
 // ============ 通知类型图标 ============

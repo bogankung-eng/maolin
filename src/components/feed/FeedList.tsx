@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PostCard } from './PostCard';
+import { Skeleton } from '@/components/common/Skeleton';
 import { api } from '@/api';
 import type { Post } from '@/types';
 
@@ -16,6 +17,27 @@ function getScrollParent(node: HTMLElement | null): HTMLElement | null {
   return null;
 }
 
+/** 加载/刷新骨架行（role=status 供读屏感知加载中） */
+function FeedSkeleton({ variant }: { variant: 'full' | 'compact' }) {
+  return (
+    <div className="border-b border-border bg-surface px-4 py-4" role="status" aria-label="加载中">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-9 w-9 rounded-full" />
+        <Skeleton className="h-3 w-24 rounded-pill" />
+      </div>
+      {variant === 'compact' ? (
+        <div className="mt-3 flex gap-3">
+          <Skeleton className="h-[88px] flex-1 rounded-button" />
+          <Skeleton className="h-[88px] w-[88px] rounded-button" />
+        </div>
+      ) : (
+        <Skeleton className="mt-3 h-[120px] w-full rounded-button" />
+      )}
+      <Skeleton className="mt-3 h-3 w-full rounded-pill" />
+    </div>
+  );
+}
+
 /**
  * 卡片流：上滑加载更多 + 下拉刷新（P0-7/8）。
  * 竞态防护：
@@ -24,7 +46,13 @@ function getScrollParent(node: HTMLElement | null): HTMLElement | null {
  * - listRef 列表变更丢弃过期响应
  * - IO 只依赖 [posts] 重建
  */
-export function FeedList({ posts }: { posts: Post[] }) {
+export function FeedList({
+  posts,
+  variant = 'full',
+}: {
+  posts: Post[];
+  variant?: 'full' | 'compact';
+}) {
   const [visible, setVisible] = useState(PAGE);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -126,17 +154,17 @@ export function FeedList({ posts }: { posts: Post[] }) {
 
   return (
     <div onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      {refreshing && <div className="py-2 text-center text-xs text-text-tertiary">刷新中…</div>}
+      {refreshing && <FeedSkeleton variant={variant} />}
       {shown.map((p, i) => (
         <div
           key={p.id}
           className="animate-fade-up"
           style={{ animationDelay: `${(i % PAGE) * 60}ms` }}
         >
-          <PostCard post={p} />
+          <PostCard post={p} variant={variant} />
         </div>
       ))}
-      {loading && <div className="py-3 text-center text-xs text-text-tertiary">加载中…</div>}
+      {loading && <FeedSkeleton variant={variant} />}
       {visible >= posts.length && posts.length > 0 && (
         <div className="py-3 text-center text-xs text-text-tertiary">没有更多了</div>
       )}

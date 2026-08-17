@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/useAppStore';
 import { Icon } from '@/components/common/Icon';
-import { computeHealthStatus } from '@/types';
+import { computeHealthStatus } from '@/lib/health';
 import type { HealthStatus, Pet } from '@/types';
 
 interface PetAlert {

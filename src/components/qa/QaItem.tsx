@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/common/Badge';
 import { Icon } from '@/components/common/Icon';
+import { FavoriteButton } from '@/components/common/FavoriteButton';
 import { CategoryLabel, CategoryColor, CategoryBg } from '@/lib/icons';
 import type { Question } from '@/types';
 
@@ -45,6 +46,9 @@ export function QaItem({ question }: { question: Question }) {
             兽医 <Icon name="vet" size={14} /> 已回答
           </span>
         )}
+        <span className="ml-auto">
+          <FavoriteButton type="question" id={question.id} size="sm" />
+        </span>
       </div>
     </article>
   );

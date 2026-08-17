@@ -1,7 +1,6 @@
 import { makePost, makeQuestion, makeComment } from '@/mock/data';
+import { genId } from '@/lib/id';
 import type { Post, Question, Answer, Comment, PostInput, QuestionInput, AnswerInput } from '@/types';
-
-const genId = (): string => 'id_' + Math.random().toString(36).slice(2, 10);
 
 /**
  * mock 同步桥（store 专用）：在 mock 模式下同步构造实体，保证 UI 即时同步、

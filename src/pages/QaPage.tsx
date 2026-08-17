@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { CategoryFilter } from '@/components/layout/CategoryFilter';
 import { QaList } from '@/components/qa/QaList';
@@ -17,6 +17,14 @@ export function QaPage() {
   const [showSearch, setShowSearch] = useState(false);
   // 状态筛选为页面级本地 state（不持久化、不入 store），与分类筛选叠加
   const [qaStatus, setQaStatus] = useState<QaFilter>('all');
+  // 筛选计算为「过渡」更新，isPending 时展示骨架屏（P3 QA 加载）
+  const [isPending, startTransition] = useTransition();
+
+  // 用过渡包裹筛选状态更新，避免大列表筛选阻塞输入（搜索/切分类即时响应）
+  const changeCategory = (c: Parameters<typeof setQaCategory>[0]) =>
+    startTransition(() => setQaCategory(c));
+  const changeStatus = (s: QaFilter) => startTransition(() => setQaStatus(s));
+  const changeKeyword = (k: string) => startTransition(() => setQaKeyword(k));
 
   const filtered = useMemo(() => {
     let list = questions;
@@ -62,7 +70,7 @@ export function QaPage() {
             <input
               autoFocus
               value={qaKeyword}
-              onChange={(e) => setQaKeyword(e.target.value)}
+              onChange={(e) => changeKeyword(e.target.value)}
               placeholder="搜索问题"
               className="transition-bg w-full rounded-button border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-brand"
             />
@@ -70,9 +78,9 @@ export function QaPage() {
         )}
       </header>
 
-      <CategoryFilter value={qaCategory} onChange={setQaCategory} />
-      <QaStatusFilter value={qaStatus} onChange={setQaStatus} />
-      <QaList questions={filtered} />
+      <CategoryFilter value={qaCategory} onChange={changeCategory} />
+      <QaStatusFilter value={qaStatus} onChange={changeStatus} />
+      <QaList questions={filtered} loading={isPending} />
     </div>
   );
 }
